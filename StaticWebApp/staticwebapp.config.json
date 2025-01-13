@@ -1,0 +1,30 @@
+{
+    "routes": [
+      {
+        "route": "/",
+        "allowedRoles": ["authenticated"]
+      },
+      {
+        "route": "/.auth/login/aad",
+        "statusCode": 302
+      },
+      {
+        "route": "/.auth/logout",
+        "statusCode": 302
+      }
+    ],
+    "auth": {
+      "identityProviders": {
+        "azureActiveDirectory": {
+          "registration": {
+            "clientId": "3ef5aac4-dabf-40ad-b133-e72dce761112",
+            "clientSecretSettingName": "SECRET"
+          }
+        }
+      }
+    },
+    "navigationFallback": {
+      "rewrite": "/index.html",
+      "exclude": ["/.auth/**"]
+    }
+  }
