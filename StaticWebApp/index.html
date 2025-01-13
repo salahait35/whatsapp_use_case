@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page d'Accueil</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            margin: 1rem 0;
+        }
+        a {
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenue sur notre application</h1>
+        <p>Si vous êtes déjà connecté, cliquez ci-dessous pour accéder à votre espace privé.</p>
+        <a href="/home.html">Accéder à votre espace privé</a>
+        <p>Pas encore connecté ? Cliquez sur le bouton ci-dessous pour vous connecter ou créer un compte.</p>
+        <a href="/.auth/login/aad">Se connecter</a>
+    </div>
+</body>
+</html>
