@@ -25,6 +25,7 @@
     },
     "navigationFallback": {
       "rewrite": "/index.html",
-      "exclude": ["/.auth/**"]
+      "exclude": ["/.auth/*"]
     }
   }
+  
