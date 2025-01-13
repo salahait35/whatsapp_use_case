@@ -1,21 +1,13 @@
 {
     "routes": [
       {
-        "route": "/",
-        "allowedRoles": ["authenticated"]  
+        "route": "/inscription",
+        "allowedRoles": ["anonymous"],  
+        "rewrite": "/inscription.html"
       },
       {
         "route": "/.auth/login/aad",
-        "statusCode": 302  
-      },
-      {
-        "route": "/.auth/logout",
-        "statusCode": 302 
-      },
-      {
-        "route": "/unauthorized",
-        "allowedRoles": ["anonymous"], 
-        "rewrite": "/unauthorized.html" 
+        "statusCode": 302
       }
     ],
     "auth": {
