@@ -9,15 +9,28 @@
           "clientSecretSettingName": "ZEBI"
         }
       }
+    },
+    "login": {
+      "login": "/.auth/login/aad",
+      "logout": "/.auth/logout",   
+      "callback": "/index.html"    
     }
   },
-"routes": [
+  "routes": [
     {
       "route": "/",
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": ["authenticated"] 
     },
     {
       "route": "/auth/login",
+      "rewrite": "/index.html" 
+    },
+    {
+      "route": "/index.html",
+      "allowedRoles": ["authenticated"] 
+    },
+    {
+      "route": "/*",
       "rewrite": "/index.html"
     }
   ]
