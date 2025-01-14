@@ -40,3 +40,6 @@ terraform.rc
 template/.terraform.lock.hcl
 webapp/.vs/*
 webapp/messagingapp-test/.vs/*
+webapp/messagingapp-test/bin/*
+webapp/messagingapp-test/obj/*
+
