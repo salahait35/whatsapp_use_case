@@ -12,22 +12,27 @@
     },
     "login": {
       "login": "/.auth/login/aad",
-      "logout": "/.auth/logout",   
-      "callback": "/index.html"    
+      "logout": "/.auth/logout",
+      "callback": "/home.html"
     }
   },
   "routes": [
     {
       "route": "/",
-      "allowedRoles": ["authenticated"] 
-    },
-    {
-      "route": "/auth/login",
-      "rewrite": "/index.html" 
+      "rewrite": "/index.html",
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/index.html",
-      "allowedRoles": ["authenticated"] 
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/home.html",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/auth/login",
+      "rewrite": "/index.html"
     },
     {
       "route": "/*",
