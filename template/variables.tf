@@ -22,3 +22,7 @@ variable "tenant_id" {
   type    = string
   default = "d7c4eaa4-f23f-4da8-ac82-79a2732c514f"
 }
+variable "repository_url" {
+  type        = string
+  default     = "https://github.com/salahait35/whatsapp_use_case"
+}
