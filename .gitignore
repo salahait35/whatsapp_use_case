@@ -42,4 +42,5 @@ webapp/.vs/*
 webapp/messagingapp-test/.vs/*
 webapp/messagingapp-test/bin/*
 webapp/messagingapp-test/obj/*
+webapp/messagingapp-test/messagingapp-test/bin/Debug/net8.0/*
 
