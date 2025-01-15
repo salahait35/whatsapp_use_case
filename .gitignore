@@ -38,9 +38,10 @@ override.tf.json
 terraform.rc
 
 template/.terraform.lock.hcl
-webapp/.vs/*
-webapp/messagingapp-test/.vs/*
-webapp/messagingapp-test/bin/*
-webapp/messagingapp-test/obj/*
-webapp/messagingapp-test/messagingapp-test/bin/Debug/net8.0/*
+WebappWhatsapp/.vs/*
+WebappWhatsapp/WebappWhatsapp/.vs/*
+WebappWhatsapp/WebappWhatsapp/bin/*
+WebappWhatsapp/WebappWhatsapp/obj/*
+WebappWhatsapp/WebappWhatsapp/wwwroot/*
+WebappWhatsapp/WebappWhatsapp/bin/Debug/net8.0/*
 

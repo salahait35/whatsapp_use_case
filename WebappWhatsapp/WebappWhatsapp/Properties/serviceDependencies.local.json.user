@@ -1,0 +1,48 @@
+{
+  "dependencies": {
+    "cosmosdb1": {
+      "restored": true,
+      "restoreTime": "2025-01-15T09:36:41.6126586Z"
+    },
+    "identityapp1": {
+      "restored": true,
+      "restoreTime": "2025-01-15T09:30:50.3334238Z"
+    },
+    "signalr1": {
+      "restored": true,
+      "restoreTime": "2025-01-15T09:29:56.3253973Z"
+    }
+  },
+  "parameters": {
+    "cosmosdb1.subscriptionId": {
+      "Name": "cosmosdb1.subscriptionId",
+      "Type": "subscription",
+      "Value": "1d874ea7-d53d-4cef-9987-572bff2963ba"
+    },
+    "signalr1.serviceConnectorResourceGroupName": {
+      "Name": "signalr1.serviceConnectorResourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    },
+    "cosmosdb1.serviceConnectorResourceGroupName": {
+      "Name": "cosmosdb1.serviceConnectorResourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    },
+    "signalr1.resourceGroupName": {
+      "Name": "signalr1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    },
+    "cosmosdb1.resourceGroupName": {
+      "Name": "cosmosdb1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    },
+    "signalr1.subscriptionId": {
+      "Name": "signalr1.subscriptionId",
+      "Type": "subscription",
+      "Value": "1d874ea7-d53d-4cef-9987-572bff2963ba"
+    }
+  }
+}
