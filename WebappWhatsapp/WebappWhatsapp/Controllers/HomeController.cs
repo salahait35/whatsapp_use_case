@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using WebappWhatsapp.Models;
+using User = WebappWhatsapp.Models.User;
 
 namespace WebappWhatsapp.Controllers
 {
@@ -10,9 +12,12 @@ namespace WebappWhatsapp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ICosmosDbService _cosmosDbService;
+
+        public HomeController(ILogger<HomeController> logger, ICosmosDbService cosmosDbService)
         {
             _logger = logger;
+            _cosmosDbService = cosmosDbService;
         }
 
         public IActionResult Index()
@@ -31,5 +36,19 @@ namespace WebappWhatsapp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public async Task<IActionResult> AddUserData(string username, string email)
+        {
+            var userData = new User
+            {
+                id = email, // ID basé sur l'email
+                Email = email,
+                Username = username
+            };
+
+            await _cosmosDbService.AddUserAsync(userData);
+            return Ok();
+        }
+
     }
 }

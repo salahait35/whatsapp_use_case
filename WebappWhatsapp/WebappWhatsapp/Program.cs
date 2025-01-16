@@ -5,8 +5,21 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.Azure.SignalR;
+using Microsoft.Azure.Cosmos;
+using WebappWhatsapp.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<ICosmosDbService>(sp =>
+{
+    var cosmosClient = new CosmosClient(builder.Configuration["CosmosDb:ConnectionString"]);
+    return new CosmosDbService(
+        cosmosClient,
+        builder.Configuration["CosmosDb:DatabaseName"],
+        builder.Configuration["CosmosDb:ContainerName"]
+    );
+});
 
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -22,6 +35,12 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]!);
+
+
+
+// Ajoute ici la configuration Cosmos DB
+
+
 
 var app = builder.Build();
 
