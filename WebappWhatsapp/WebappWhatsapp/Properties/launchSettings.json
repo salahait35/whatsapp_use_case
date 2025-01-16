@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:29059",
+      "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:29059",
       "sslPort": 44312
     }
   },
@@ -13,7 +13,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:7172;http://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:5087",
+      "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:7172;https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:5087",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR"
