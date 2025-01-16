@@ -13,13 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ICosmosDbService>(sp =>
 {
-    var cosmosClient = new CosmosClient(builder.Configuration["CosmosDb:ConnectionString"]);
     return new CosmosDbService(
-        cosmosClient,
+        builder.Configuration["CosmosDb:AccountEndpoint"],
         builder.Configuration["CosmosDb:DatabaseName"],
         builder.Configuration["CosmosDb:ContainerName"]
     );
 });
+
 
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)

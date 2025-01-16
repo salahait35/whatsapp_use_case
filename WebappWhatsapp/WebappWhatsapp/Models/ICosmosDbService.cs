@@ -26,36 +26,26 @@ namespace WebappWhatsapp.Models
     {
         private readonly Container _container;
 
-        // Constructeur pour initialiser le conteneur Cosmos DB
         public CosmosDbService(string accountEndpoint, string databaseName, string containerName)
         {
-            {
-                var aadCredential = new DefaultAzureCredential();
-                var cosmosClient = new CosmosClient(accountEndpoint, aadCredential);
-                _container = cosmosClient.GetContainer(databaseName, containerName);
-            }
+            // Utilisation d'un jeton AAD via DefaultAzureCredential
+            var aadCredential = new DefaultAzureCredential();
+            var cosmosClient = new CosmosClient(accountEndpoint, aadCredential);
+            _container = cosmosClient.GetContainer(databaseName, containerName);
         }
 
-        // Implémentation pour ajouter un utilisateur
         public async Task AddUserAsync(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            // Assure que l'ID est défini
+            // S'assurer que l'ID est défini
             if (string.IsNullOrEmpty(user.id))
             {
-                user.id = user.Email; // Utilise l'email comme identifiant unique
+                user.id = user.Email; // Par défaut, utiliser l'email comme identifiant
             }
 
-            try
-            {
-                await _container.CreateItemAsync(user, new PartitionKey(user.id));
-            }
-            catch (CosmosException ex)
-            {
-                throw new Exception($"Erreur lors de l'ajout de l'utilisateur : {ex.Message}", ex);
-            }
+            await _container.CreateItemAsync(user, new PartitionKey(user.id));
         }
     }
 }
