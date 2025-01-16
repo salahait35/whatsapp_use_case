@@ -60,11 +60,9 @@ jobs:
       
       # Étape 2 : Connexion à Azure
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Étape 3 : Déployer l'application sur Azure Web App
       - name: Deploy to Azure Web App
