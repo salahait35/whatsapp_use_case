@@ -15,7 +15,7 @@
       "launchBrowser": true,
       "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:7172;http://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:5087",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Production",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR"
       }
     },
@@ -23,7 +23,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Production",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR"
       }
     }
