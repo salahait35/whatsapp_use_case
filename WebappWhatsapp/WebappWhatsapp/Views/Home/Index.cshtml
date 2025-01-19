@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Messaging App";
 }
+@model WebappWhatsapp.Models.ChatViewModel
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -65,13 +67,14 @@
             <div class="col-md-4 bg-white p-3">
                 <h5 class="mb-4">Contacts</h5>
                 <div class="contacts-list">
-                    @foreach (var contact in Model.Contacts)
+                    @foreach (var conversation in Model.Conversations)
                     {
+                        var lastMessage = conversation.LastMessage ?? "No messages yet";
                         <div class="d-flex align-items-center p-2 border-bottom">
-                            <img src="@contact.ImageUrl" alt="avatar" class="rounded-circle me-3" width="50" height="50">
+                            <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-3" width="50" height="50">
                             <div>
-                                <p class="fw-bold mb-0">@contact.Name</p>
-                                <p class="text-muted small mb-0">@contact.LastMessage</p>
+                                <p class="fw-bold mb-0">@string.Join(", ", conversation.Members)</p>
+                                <p class="text-muted small mb-0">@lastMessage</p>
                             </div>
                         </div>
                     }
@@ -83,14 +86,18 @@
                 <div class="chat-messages p-3 flex-grow-1">
                     @foreach (var message in Model.Messages)
                     {
-                        <div class="d-flex @message.CssClass mb-3">
-                            @if (!message.IsSentByUser)
+                        // Pour gérer les messages envoyés et reçus
+                        var messageClass = message.SenderId == Model.CurrentUser.id ? "message-sent" : "message-received";
+                        var messageTime = message.LastMessageTimestamp.ToString("HH:mm");
+
+                        <div class="d-flex @messageClass mb-3">
+                            @if (message.SenderId != Model.CurrentUser.id)
                             {
-                                <img src="@message.UserAvatar" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                                <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-2" width="40" height="40">
                             }
                             <div>
-                                <p class="message @message.MessageType">@message.Content</p>
-                                <p class="message-time text-muted">@message.TimeSent</p>
+                                <p class="message @messageClass">@message.Content</p>
+                                <p class="message-time text-muted">@messageTime</p>
                             </div>
                         </div>
                     }

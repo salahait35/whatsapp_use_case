@@ -12,15 +12,7 @@ namespace WebappWhatsapp.Models
         Task AddUserAsync(User user); // Méthode pour ajouter un utilisateur
     }
 
-    // Classe utilisateur
-    public class User
-    {
-        [JsonProperty("id")]
-        public required string id { get; set; } // ID unique requis par Cosmos DB
-        public string Email { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Email { get; set; }
-        public string Username { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Username { get; set; }
 
-    }
 
     // Implémentation du service Cosmos DB
     public class CosmosDbService : ICosmosDbService

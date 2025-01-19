@@ -11,6 +11,8 @@ namespace WebappWhatsapp.Models
         public required string ConversationId { get; set; }
         public required string SenderId { get; set; }
         public required string Content { get; set; }
+
+        public DateTime LastMessageTimestamp { get; set; }
         public required List<string> ReadBy { get; set; } = new List<string>();
     }
 }
