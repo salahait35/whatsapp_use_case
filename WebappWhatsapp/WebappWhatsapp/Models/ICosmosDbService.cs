@@ -46,7 +46,21 @@ namespace WebappWhatsapp.Models
                 user.id = user.Email; // Par défaut, utiliser l'email comme identifiant
             }
 
-            await _container.CreateItemAsync(user, new PartitionKey(user.id));
+            try
+            {
+                // Vérifier si un utilisateur avec cet ID existe déjà
+                var existingUser = await _container.ReadItemAsync<User>(user.id, new PartitionKey(user.id));
+                if (existingUser != null)
+                {
+                    throw new Exception($"Un utilisateur avec l'ID {user.id} existe déjà.");
+                }
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // Si l'utilisateur n'existe pas, ajouter le nouvel utilisateur
+                await _container.CreateItemAsync(user, new PartitionKey(user.id));
+            }
         }
+
     }
 }
