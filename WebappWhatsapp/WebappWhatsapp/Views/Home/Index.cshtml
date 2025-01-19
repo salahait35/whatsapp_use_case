@@ -1,14 +1,110 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@page
+@model YourAppNamespace.Pages.LandingPageModel
+@{
+    ViewData["Title"] = "Messaging App";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <form method="post" action="/Home/AddUserData">
-    <input type="hidden" name="username" value="@User.Identity.Name" />
-    <input type="hidden" name="email" value="@User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value" />
-    <button type="submit" class="btn btn-primary">Enregistrer mes informations</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f5f7;
+        }
 
-</div>
+        .chat-container {
+            height: 100vh;
+        }
+
+        .contacts-list {
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .chat-messages {
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .message-input {
+            border-top: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message-sent {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message-received {
+            background-color: #e9ecef;
+            align-self: flex-start;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid chat-container">
+        <div class="row h-100">
+            <!-- Sidebar Contacts -->
+            <div class="col-md-4 bg-white p-3">
+                <h5 class="mb-4">Contacts</h5>
+                <div class="contacts-list">
+                    @foreach (var contact in Model.Contacts)
+                    {
+                        <div class="d-flex align-items-center p-2 border-bottom">
+                            <img src="@contact.ImageUrl" alt="avatar" class="rounded-circle me-3" width="50" height="50">
+                            <div>
+                                <p class="fw-bold mb-0">@contact.Name</p>
+                                <p class="text-muted small mb-0">@contact.LastMessage</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="col-md-8 d-flex flex-column">
+                <div class="chat-messages p-3 flex-grow-1">
+                    @foreach (var message in Model.Messages)
+                    {
+                        <div class="d-flex @message.CssClass mb-3">
+                            @if (!message.IsSentByUser)
+                            {
+                                <img src="@message.UserAvatar" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                            }
+                            <div>
+                                <p class="message @message.MessageType">@message.Content</p>
+                                <p class="message-time text-muted">@message.TimeSent</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="message-input d-flex align-items-center">
+                    <input type="text" class="form-control form-control-lg me-2" placeholder="Type a message">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
