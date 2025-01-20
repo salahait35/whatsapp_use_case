@@ -22,7 +22,7 @@ namespace WebappWhatsapp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Récupération de l'e-mail depuis les revendications
+            // Récupérez l'email de l'utilisateur connecté
             var email = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
 
             if (string.IsNullOrEmpty(email))
@@ -30,15 +30,15 @@ namespace WebappWhatsapp.Controllers
                 throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
             }
 
-            // Récupération ou création de l'utilisateur
+            // Récupérez ou créez l'utilisateur
             var currentUser = await GetOrCreateUserAsync(email);
 
-            // Préparation du modèle de vue
+            // Initialisez le modèle
             var model = new ChatViewModel
             {
                 CurrentUser = currentUser,
                 Conversations = GetConversationsForUser(currentUser.id),
-                Messages = GetMessagesForConversation(null) // Aucun message si aucune conversation sélectionnée
+                Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
             return View(model);
