@@ -7,8 +7,8 @@ using User = WebappWhatsapp.Models.User;
 
 namespace WebappWhatsapp.Controllers
 {
-    //[Authorize]
-    [AllowAnonymous]
+    [Authorize]
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
