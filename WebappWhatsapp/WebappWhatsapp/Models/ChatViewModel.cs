@@ -21,6 +21,7 @@ namespace WebappWhatsapp.Models
         public ChatViewModel()
         {
             Conversations = new List<Conversation>();
+            CurrentUser = new User();
         }
     }
 }

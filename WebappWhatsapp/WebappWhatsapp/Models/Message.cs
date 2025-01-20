@@ -14,5 +14,8 @@ namespace WebappWhatsapp.Models
 
         public DateTime LastMessageTimestamp { get; set; }
         public required List<string> ReadBy { get; set; } = new List<string>();
+
+
+        public Message() { }
     }
 }
