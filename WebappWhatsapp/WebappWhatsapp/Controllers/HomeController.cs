@@ -7,7 +7,8 @@ using User = WebappWhatsapp.Models.User;
 
 namespace WebappWhatsapp.Controllers
 {
-    [Authorize]
+    //[Authorize]
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -27,7 +28,8 @@ namespace WebappWhatsapp.Controllers
 
             if (string.IsNullOrEmpty(email))
             {
-                throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
+                email = "salahait@gmail.com";
+                //throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
             }
 
             // Récupérez ou créez l'utilisateur
@@ -37,7 +39,8 @@ namespace WebappWhatsapp.Controllers
             var model = new ChatViewModel
             {
                 CurrentUser = currentUser,
-                Conversations = GetConversationsForUser(currentUser.id),
+                //Conversations = GetConversationsForUser(currentUser.id),
+                Conversations = new List<Conversation>(), // Initialisez la liste pour éviter des erreurs
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
@@ -74,7 +77,7 @@ namespace WebappWhatsapp.Controllers
         {
             // Recherchez l'utilisateur par e-mail dans Cosmos DB
             var query = $"SELECT * FROM c WHERE c.Email = '{email}'";
-            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
+            /*var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
 
             // Vérifiez si un utilisateur existe
             var existingUser = users.FirstOrDefault();
@@ -83,7 +86,7 @@ namespace WebappWhatsapp.Controllers
                 // L'utilisateur existe, renvoyez-le
                 return existingUser;
             }
-
+            */
             // L'utilisateur n'existe pas, créez-le
             var newUser = new User
             {
