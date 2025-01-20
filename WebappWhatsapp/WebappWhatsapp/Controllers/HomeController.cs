@@ -23,28 +23,29 @@ namespace WebappWhatsapp.Controllers
 
         public async Task<IActionResult> Index()
         {
+
+            ViewData["Title"] = "Messaging App";
             // Récupérez l'email de l'utilisateur connecté
             var email = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
 
             if (string.IsNullOrEmpty(email))
             {
-                email = "salahait@gmail.com";
-                //throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
+                throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
             }
 
             // Récupérez ou créez l'utilisateur
             var currentUser = await GetOrCreateUserAsync(email);
-
+           
             // Initialisez le modèle
-            var model = new ChatViewModel
+            var Model = new ChatViewModel
             {
-                CurrentUser = currentUser,
-                //Conversations = GetConversationsForUser(currentUser.id),
-                Conversations = new List<Conversation>(), // Initialisez la liste pour éviter des erreurs
+                CurrentUser =  currentUser,
+                Conversations = GetConversationsForUser(currentUser.id),
+               
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
-            return View(model);
+            return View(Model);
         }
 
         private List<Conversation> GetConversationsForUser(string userId)
@@ -77,7 +78,7 @@ namespace WebappWhatsapp.Controllers
         {
             // Recherchez l'utilisateur par e-mail dans Cosmos DB
             var query = $"SELECT * FROM c WHERE c.Email = '{email}'";
-            /*var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
+            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
 
             // Vérifiez si un utilisateur existe
             var existingUser = users.FirstOrDefault();
@@ -86,7 +87,7 @@ namespace WebappWhatsapp.Controllers
                 // L'utilisateur existe, renvoyez-le
                 return existingUser;
             }
-            */
+            
             // L'utilisateur n'existe pas, créez-le
             var newUser = new User
             {
