@@ -4,7 +4,6 @@
 }
 @model WebappWhatsapp.Models.ChatViewModel
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,16 +66,23 @@
             <div class="col-md-4 bg-white p-3">
                 <h5 class="mb-4">Contacts</h5>
                 <div class="contacts-list">
-                    @foreach (var conversation in Model.Conversations)
+                    @if (Model.Conversations != null && Model.Conversations.Any())
                     {
-                        var lastMessage = conversation.LastMessage ?? "No messages yet";
-                        <div class="d-flex align-items-center p-2 border-bottom">
-                            <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-3" width="50" height="50">
-                            <div>
-                                <p class="fw-bold mb-0">@string.Join(", ", conversation.Members)</p>
-                                <p class="text-muted small mb-0">@lastMessage</p>
+                        @foreach (var conversation in Model.Conversations)
+                        {
+                            var lastMessage = conversation.LastMessage ?? "No messages yet";
+                            <div class="d-flex align-items-center p-2 border-bottom">
+                                <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-3" width="50" height="50">
+                                <div>
+                                    <p class="fw-bold mb-0">@string.Join(", ", conversation.Members)</p>
+                                    <p class="text-muted small mb-0">@lastMessage</p>
+                                </div>
                             </div>
-                        </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No contacts available.</p>
                     }
                 </div>
             </div>
@@ -84,22 +90,28 @@
             <!-- Chat Section -->
             <div class="col-md-8 d-flex flex-column">
                 <div class="chat-messages p-3 flex-grow-1">
-                    @foreach (var message in Model.Messages)
+                    @if (Model.Messages != null && Model.Messages.Any())
                     {
-                        // Pour gérer les messages envoyés et reçus
-                        var messageClass = message.SenderId == Model.CurrentUser.id ? "message-sent" : "message-received";
-                        var messageTime = message.LastMessageTimestamp.ToString("HH:mm");
+                        @foreach (var message in Model.Messages)
+                        {
+                            var messageClass = message.SenderId == Model.CurrentUser?.id ? "message-sent" : "message-received";
+                            var messageTime = message.LastMessageTimestamp.ToString("HH:mm");
 
-                        <div class="d-flex @messageClass mb-3">
-                            @if (message.SenderId != Model.CurrentUser.id)
-                            {
-                                <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-2" width="40" height="40">
-                            }
-                            <div>
-                                <p class="message @messageClass">@message.Content</p>
-                                <p class="message-time text-muted">@messageTime</p>
+                            <div class="d-flex @messageClass mb-3">
+                                @if (message.SenderId != Model.CurrentUser?.id)
+                                {
+                                    <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                                }
+                                <div>
+                                    <p class="message @messageClass">@message.Content</p>
+                                    <p class="message-time text-muted">@messageTime</p>
+                                </div>
                             </div>
-                        </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center mt-5">No messages yet. Start the conversation!</p>
                     }
                 </div>
 
