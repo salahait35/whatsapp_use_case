@@ -10,6 +10,9 @@ namespace WebappWhatsapp.Models
     public interface ICosmosDbService
     {
         Task AddUserAsync(User user); // Méthode pour ajouter un utilisateur
+
+        Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query);
+        Task AddItemAsync<T>(string containerName, T item);
     }
 
 
@@ -54,5 +57,26 @@ namespace WebappWhatsapp.Models
             }
         }
 
+        public async Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query)
+        {
+            var container = _container.Database.GetContainer(containerName);
+            var queryDefinition = new QueryDefinition(query);
+            var queryIterator = container.GetItemQueryIterator<T>(queryDefinition);
+
+            var results = new List<T>();
+            while (queryIterator.HasMoreResults)
+            {
+                var response = await queryIterator.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results;
+        }
+
+        public async Task AddItemAsync<T>(string containerName, T item)
+        {
+            var container = _container.Database.GetContainer(containerName);
+            await container.CreateItemAsync(item);
+        }
     }
 }

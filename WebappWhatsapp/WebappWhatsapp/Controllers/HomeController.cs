@@ -20,9 +20,42 @@ namespace WebappWhatsapp.Controllers
             _cosmosDbService = cosmosDbService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Récupération de l'e-mail depuis les revendications
+            var email = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
+            }
+
+            // Récupération ou création de l'utilisateur
+            var currentUser = await GetOrCreateUserAsync(email);
+
+            // Préparation du modèle de vue
+            var model = new ChatViewModel
+            {
+                CurrentUser = currentUser,
+                Conversations = GetConversationsForUser(currentUser.id),
+                Messages = GetMessagesForConversation(null) // Aucun message si aucune conversation sélectionnée
+            };
+
+            return View(model);
+        }
+
+        private List<Conversation> GetConversationsForUser(string userId)
+        {
+            var query = $"SELECT * FROM c WHERE c.UserId = '{userId}'";
+            return _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", query).Result.ToList();
+        }
+
+        private List<Message> GetMessagesForConversation(string conversationId)
+        {
+            if (string.IsNullOrEmpty(conversationId)) return new List<Message>();
+
+            var query = $"SELECT * FROM c WHERE c.ConversationId = '{conversationId}'";
+            return _cosmosDbService.QueryItemsAsync<Message>("Messages", query).Result.ToList();
         }
 
         public IActionResult Privacy()
@@ -37,18 +70,32 @@ namespace WebappWhatsapp.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public async Task<IActionResult> AddUserData(string username, string email)
+        public async Task<User> GetOrCreateUserAsync(string email)
         {
-            var userData = new User
+            // Recherchez l'utilisateur par e-mail dans Cosmos DB
+            var query = $"SELECT * FROM c WHERE c.Email = '{email}'";
+            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
+
+            // Vérifiez si un utilisateur existe
+            var existingUser = users.FirstOrDefault();
+            if (existingUser != null)
             {
-                id = email, // ID basé sur l'email
+                // L'utilisateur existe, renvoyez-le
+                return existingUser;
+            }
+
+            // L'utilisateur n'existe pas, créez-le
+            var newUser = new User
+            {
                 Email = email,
-                Username = username
+                Username = email.Split('@')[0], // Par défaut, utilisez la partie avant le @ comme nom d'utilisateur
             };
 
-            await _cosmosDbService.AddUserAsync(userData);
-            return Ok();
+            await _cosmosDbService.AddItemAsync("Users", newUser);
+            return newUser;
         }
+
+
 
 
     }
