@@ -9,7 +9,11 @@ namespace WebappWhatsapp.Models
         [JsonProperty("id")]
         public string id { get; set; } = Guid.NewGuid().ToString(); // Génère un ID unique par défaut
         public string Type { get; set; } = "text"; // Défaut : "text", peut être modifié
-        public required List<string> Members { get; set; } = new List<string>();
+
+        // Le membre obligatoire 'Members' doit être initialisé avant l'utilisation.
+        [JsonProperty("members")]
+        public List<string> Members { get; set; } = new List<string>();  // Initialisé par défaut ici
+
         public string LastMessage { get; set; } = "No messages yet"; // Défaut pour une nouvelle conversation
         public DateTime LastMessageTimestamp { get; set; } = DateTime.UtcNow; // Par défaut, utilise l'heure actuelle
 
