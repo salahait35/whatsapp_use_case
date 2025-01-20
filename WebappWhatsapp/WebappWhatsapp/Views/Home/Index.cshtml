@@ -4,6 +4,15 @@
 }
 @model WebappWhatsapp.Models.ChatViewModel
 
+@if (Model == null)
+{
+    <div class="text-danger">Error: The model is null. Ensure the controller passes a valid model to the view.</div>
+}
+else
+{
+    <!-- Continue rendering the view -->
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -143,3 +152,4 @@
     </div>
 </body>
 </html>
+}
