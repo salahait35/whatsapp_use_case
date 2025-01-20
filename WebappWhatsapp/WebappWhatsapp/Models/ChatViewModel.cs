@@ -15,13 +15,25 @@ namespace WebappWhatsapp.Models
         // Conversation actuellement sélectionnée
         public Conversation SelectedConversation { get; set; }
 
-        public List<Message> Messages { get; set; } = new List<Message>();
+        // Liste des messages de la conversation sélectionnée
+        public List<Message> Messages { get; set; }
 
-        // Constructeur pour initialiser la liste des conversations
+        // Constructeur par défaut pour initialiser la liste des conversations
         public ChatViewModel()
         {
             Conversations = new List<Conversation>();
+            Messages = new List<Message>();
             CurrentUser = new User();
+            SelectedConversation = new Conversation();
+        }
+
+        // Constructeur avec paramètres pour initialiser les propriétés avec des valeurs spécifiques
+        public ChatViewModel(User currentUser, List<Conversation> conversations, Conversation selectedConversation, List<Message> messages)
+        {
+            CurrentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+            Conversations = conversations ?? new List<Conversation>();
+            SelectedConversation = selectedConversation ?? new Conversation();
+            Messages = messages ?? new List<Message>();
         }
     }
 }

@@ -14,7 +14,10 @@ namespace WebappWhatsapp.Models
         public DateTime LastMessageTimestamp { get; set; } = DateTime.UtcNow; // Par défaut, utilise l'heure actuelle
 
         // Constructeur par défaut
-        public Conversation() { }
+        public Conversation()
+        {
+            Members = new List<string>(); // Initialisation de la liste des membres
+        }
 
         // Constructeur avec paramètres pour personnaliser l'initialisation
         public Conversation(List<string> members, string type = "text", string lastMessage = "No messages yet")
