@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - whatsapp
 on:
   push:
     branches:
-      - main
+      - salah
   workflow_dispatch:
 
 jobs:
