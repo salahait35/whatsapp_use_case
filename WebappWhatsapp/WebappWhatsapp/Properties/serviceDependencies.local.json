@@ -15,7 +15,7 @@
       "connectionId": "ConnectionStrings:CosmosDBConnection"
     },
     "identityapp1": {
-      "connectionInfo": "Inscription d’application : whatsapp-appaspnet, locataire : whatsapp (whatsappissy.onmicrosoft.com - AAD B2C)",
+      "connectionInfo": "Inscription d’application : whatspp-salah, locataire : whatsapp (whatsappissy.onmicrosoft.com - AAD B2C)",
       "type": "identityapp.default"
     }
   }
