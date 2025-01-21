@@ -13,7 +13,7 @@ namespace WebappWhatsapp.Models
         public required string Content { get; set; }
 
         public DateTime LastMessageTimestamp { get; set; }
-        public required List<string> ReadBy { get; set; } = new List<string>();
+        public required List<string> ReadBy { get; set; } = new List<string>(); //TODO : check if we should use receiverid
 
 
         public Message() { }
