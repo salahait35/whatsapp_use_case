@@ -45,28 +45,46 @@ namespace WebappWhatsapp.Models
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            // Vérifier et définir l'ID
-            if (string.IsNullOrEmpty(user.id))
-            {
-                user.id = user.Email; // Par défaut, utiliser l'email comme identifiant
-            }
+            if (string.IsNullOrEmpty(user.Email))
+                throw new ArgumentException("L'email de l'utilisateur ne peut pas être null ou vide.");
 
             var container = GetContainer("Users"); // Récupérer le conteneur "Users"
+
             try
             {
-                // Vérifier si l'utilisateur existe déjà
-                var existingUser = await container.ReadItemAsync<User>(user.id, new PartitionKey(user.id));
-                if (existingUser != null)
+                // Vérifier si un utilisateur avec cet email existe déjà
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.Email = @Email")
+                    .WithParameter("@Email", user.Email);
+
+                using var iterator = container.GetItemQueryIterator<User>(query);
+                var results = new List<User>();
+
+                while (iterator.HasMoreResults)
                 {
-                    throw new Exception($"Un utilisateur avec l'ID {user.id} existe déjà.");
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response);
                 }
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                // Ajouter un nouvel utilisateur
+
+                if (results.Count > 0)
+                {
+                    // Si un utilisateur existe déjà, retourner ses informations ou lever une exception
+                    throw new Exception($"Un utilisateur avec l'email '{user.Email}' existe déjà.");
+                }
+
+                // Ajouter un nouvel utilisateur si aucun utilisateur n'a été trouvé
+                if (string.IsNullOrEmpty(user.id))
+                {
+                    user.id = Guid.NewGuid().ToString(); // Générer un ID unique si non défini
+                }
+
                 await container.CreateItemAsync(user, new PartitionKey(user.id));
             }
+            catch (CosmosException ex)
+            {
+                throw new Exception($"Erreur lors de la vérification ou de l'ajout de l'utilisateur : {ex.Message}", ex);
+            }
         }
+
 
         public async Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query)
         {
