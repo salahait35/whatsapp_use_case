@@ -4,20 +4,21 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "https://localhost:29059",
-      "sslPort": 44312
+        "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:29059",
+        "sslPort": 44312
     }
   },
   "profiles": {
     "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "https://localhost:7172;https://localhost:5087",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR"
-      }
+        "commandName": "Project",
+        "dotnetRunMessages": true,
+        "fefe": null,
+        "launchBrowser": true,
+        "applicationUrl": "https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:7172;https://whatsapp-cha6bpf5gdfcdrcs.francecentral-01.azurewebsites.net:5087",
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Production",
+            "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.Azure.SignalR"
+        }
     },
     "IIS Express": {
       "commandName": "IISExpress",
