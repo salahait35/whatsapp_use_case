@@ -7,7 +7,7 @@ using User = WebappWhatsapp.Models.User;
 
 namespace WebappWhatsapp.Controllers
 {
-    [Authorize]
+    [Authorize] //checkautorize
     
     public class HomeController : Controller
     {
@@ -25,24 +25,24 @@ namespace WebappWhatsapp.Controllers
         {
 
             ViewData["Title"] = "Messaging App";
-            // Récupérez l'email de l'utilisateur connecté
+            // RÃ©cupÃ©rez l'email de l'utilisateur connectÃ©
             var email = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
 
             if (string.IsNullOrEmpty(email))
             {
-                throw new Exception("L'utilisateur connecté n'a pas d'adresse e-mail.");
+                throw new Exception("L'utilisateur connectÃ© n'a pas d'adresse e-mail.");
             }
 
-            // Récupérez ou créez l'utilisateur
+            // RÃ©cupÃ©rez ou crÃ©ez l'utilisateur
             var currentUser = await GetOrCreateUserAsync(email);
            
-            // Initialisez le modèle
+            // Initialisez le modÃ¨le
             var Model = new ChatViewModel
             {
                 CurrentUser =  currentUser,
                 Conversations = GetConversationsForUser(currentUser.id),
                
-                Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
+                Messages = new List<Message>() // Initialisez la liste pour Ã©viter des erreurs
             };
 
             return View(Model);
@@ -80,7 +80,7 @@ namespace WebappWhatsapp.Controllers
             var query = $"SELECT * FROM c WHERE c.Email = '{email}'";
             var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
 
-            // Vérifiez si un utilisateur existe
+            // VÃ©rifiez si un utilisateur existe
             var existingUser = users.FirstOrDefault();
             if (existingUser != null)
             {
@@ -88,11 +88,11 @@ namespace WebappWhatsapp.Controllers
                 return existingUser;
             }
             
-            // L'utilisateur n'existe pas, créez-le
+            // L'utilisateur n'existe pas, crÃ©ez-le
             var newUser = new User
             {
                 Email = email,
-                Username = email.Split('@')[0], // Par défaut, utilisez la partie avant le @ comme nom d'utilisateur
+                Username = email.Split('@')[0], // Par dÃ©faut, utilisez la partie avant le @ comme nom d'utilisateur
             };
 
             await _cosmosDbService.AddItemAsync("Users", newUser);
