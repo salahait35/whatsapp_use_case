@@ -13,10 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ICosmosDbService>(sp =>
 {
+    var containerNames = builder.Configuration.GetSection("CosmosDb:Containers").Get<Dictionary<string, string>>();
     return new CosmosDbService(
         builder.Configuration["CosmosDb:AccountEndpoint"],
         builder.Configuration["CosmosDb:DatabaseName"],
-        builder.Configuration["CosmosDb:ContainerName"]
+        containerNames
     );
 });
 

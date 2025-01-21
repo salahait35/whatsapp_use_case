@@ -2,6 +2,7 @@
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace WebappWhatsapp.Models
@@ -10,24 +11,33 @@ namespace WebappWhatsapp.Models
     public interface ICosmosDbService
     {
         Task AddUserAsync(User user); // Méthode pour ajouter un utilisateur
-
-        Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query);
-        Task AddItemAsync<T>(string containerName, T item);
+        Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query); // Méthode pour requêter des éléments
+        Task AddItemAsync<T>(string containerName, T item); // Méthode pour ajouter un élément
     }
-
-
 
     // Implémentation du service Cosmos DB
     public class CosmosDbService : ICosmosDbService
     {
-        private readonly Container _container;
+        private readonly Dictionary<string, Container> _containers;
+        private readonly string _databaseName;
 
-        public CosmosDbService(string accountEndpoint, string databaseName, string containerName)
+        public CosmosDbService(string accountEndpoint, string databaseName, Dictionary<string, string> containerNames)
         {
+            if (containerNames == null)
+                throw new ArgumentNullException(nameof(containerNames));
+
             // Utilisation d'un jeton AAD via DefaultAzureCredential
             var aadCredential = new DefaultAzureCredential();
             var cosmosClient = new CosmosClient(accountEndpoint, aadCredential);
-            _container = cosmosClient.GetContainer(databaseName, containerName);
+
+            _databaseName = databaseName;
+            _containers = new Dictionary<string, Container>();
+
+            // Initialiser les conteneurs
+            foreach (var container in containerNames)
+            {
+                _containers[container.Key] = cosmosClient.GetContainer(_databaseName, container.Value);
+            }
         }
 
         public async Task AddUserAsync(User user)
@@ -35,16 +45,17 @@ namespace WebappWhatsapp.Models
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            // S'assurer que l'ID est défini
+            // Vérifier et définir l'ID
             if (string.IsNullOrEmpty(user.id))
             {
                 user.id = user.Email; // Par défaut, utiliser l'email comme identifiant
             }
 
+            var container = GetContainer("Users"); // Récupérer le conteneur "Users"
             try
             {
-                // Vérifier si un utilisateur avec cet ID existe déjà
-                var existingUser = await _container.ReadItemAsync<User>(user.id, new PartitionKey(user.id));
+                // Vérifier si l'utilisateur existe déjà
+                var existingUser = await container.ReadItemAsync<User>(user.id, new PartitionKey(user.id));
                 if (existingUser != null)
                 {
                     throw new Exception($"Un utilisateur avec l'ID {user.id} existe déjà.");
@@ -52,14 +63,14 @@ namespace WebappWhatsapp.Models
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                // Si l'utilisateur n'existe pas, ajouter le nouvel utilisateur
-                await _container.CreateItemAsync(user, new PartitionKey(user.id));
+                // Ajouter un nouvel utilisateur
+                await container.CreateItemAsync(user, new PartitionKey(user.id));
             }
         }
 
         public async Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query)
         {
-            var container = _container.Database.GetContainer(containerName);
+            var container = GetContainer(containerName); // Récupérer le conteneur correspondant
             var queryDefinition = new QueryDefinition(query);
             var queryIterator = container.GetItemQueryIterator<T>(queryDefinition);
 
@@ -75,8 +86,19 @@ namespace WebappWhatsapp.Models
 
         public async Task AddItemAsync<T>(string containerName, T item)
         {
-            var container = _container.Database.GetContainer(containerName);
-            await container.CreateItemAsync(item);
+            var container = GetContainer(containerName); // Récupérer le conteneur correspondant
+            await container.CreateItemAsync(item, new PartitionKey(item.GetType().GetProperty("id")?.GetValue(item)?.ToString()));
+        }
+
+        // Méthode pour obtenir un conteneur spécifique
+        private Container GetContainer(string containerName)
+        {
+            if (_containers.TryGetValue(containerName, out var container))
+            {
+                return container;
+            }
+
+            throw new ArgumentException($"Le conteneur '{containerName}' n'existe pas dans la configuration.");
         }
     }
 }
