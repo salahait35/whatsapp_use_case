@@ -17,7 +17,7 @@ namespace WebappWhatsapp.Models
         {
             id = Id;
             Email = email;
-            Username = username;
+            Username = username; //TODO check if required
         }
     public User()
         {
