@@ -14,19 +14,28 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Étape 1 : Cloner le dépôt
       - uses: actions/checkout@v4
 
+      # Étape 2 : Configurer .NET Core
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
+      # Étape 3 : Restaurer les dépendances
+      - name: Restore dependencies
+        run: dotnet restore WebappWhatsapp/WebappWhatsapp.sln
+
+      # Étape 4 : Construire la solution
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build WebappWhatsapp/WebappWhatsapp.sln --configuration Release
 
+      # Étape 5 : Publier les fichiers de l'application
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish WebappWhatsapp/WebappWhatsapp.sln -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
+      # Étape 6 : Téléverser l'artifact pour le job de déploiement
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -37,29 +46,29 @@ jobs:
     runs-on: windows-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
 
     steps:
+      # Étape 1 : Télécharger l'artifact depuis le job de build
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
+      # Étape 2 : Connexion à Azure
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0080C9F4D72A4812A6C7873981DCC3C9 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FD84C5B10ACE412D8360D566C05042E0 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9F60F23262254D5BB044193288A3168F }}
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Étape 3 : Déployer l'application sur Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'whatsapp'
-          slot-name: 'Production'
+          slot-name: 'production'
           package: .
-          
