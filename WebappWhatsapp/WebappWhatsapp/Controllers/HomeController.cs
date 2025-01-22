@@ -91,7 +91,7 @@ namespace WebappWhatsapp.Controllers
             _logger.LogInformation("Document to insert: {Document}", JsonConvert.SerializeObject(newConversation));
 
 
-            await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.ConversationId);
+            await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.id);
 
 
             return Ok(new { message = "Conversation créée avec succès." });

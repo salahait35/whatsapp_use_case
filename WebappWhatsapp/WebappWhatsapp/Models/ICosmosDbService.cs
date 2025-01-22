@@ -3,6 +3,7 @@ using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Threading.Tasks;
 
 namespace WebappWhatsapp.Models
@@ -116,6 +117,7 @@ namespace WebappWhatsapp.Models
             }
 
             var container = GetContainer(containerName); // Récupérer le conteneur correspondant
+            Console.WriteLine(item);
             await container.CreateItemAsync(item, new PartitionKey(partitionKeyValue));
         }
 
