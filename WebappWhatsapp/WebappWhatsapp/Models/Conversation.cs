@@ -6,6 +6,9 @@ namespace WebappWhatsapp.Models
 {
     public class Conversation
     {
+        [JsonProperty("id")] // Propriété obligatoire pour Cosmos DB
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+
         [JsonProperty("conversationId")] 
         public string ConversationId { get; set; } = string.Empty; // Utiliser conversationId comme clé unique et clé de partition
 
@@ -26,7 +29,9 @@ namespace WebappWhatsapp.Models
         // Constructeur avec paramètres
         public Conversation(List<string> members, string type = "text", string lastMessage = "No messages yet")
         {
+            
             ConversationId =  Guid.NewGuid().ToString();
+            Id = ConversationId;
             Members = members ?? throw new ArgumentNullException(nameof(members), "Members list cannot be null.");
             Type = type;
             LastMessage = lastMessage;
