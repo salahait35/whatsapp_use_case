@@ -51,6 +51,7 @@ namespace WebappWhatsapp.Controllers
         }
 
         [HttpPost]
+        [Route("Conversation/Create")]
         public async Task<IActionResult> CreateConversationAsync([FromBody] CreateConversationRequest request)
         {
             if (string.IsNullOrEmpty(request.Email))
