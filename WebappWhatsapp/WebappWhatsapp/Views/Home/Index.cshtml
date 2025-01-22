@@ -10,10 +10,6 @@
 }
 else
 {
-    <!-- Continue rendering the view -->
-
-
-
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -84,7 +80,12 @@ else
             <div class="row h-100">
                 <!-- Sidebar Contacts -->
                 <div class="col-md-4 bg-white p-3">
-                    <h5 class="mb-4">Contacts</h5>
+                    <h5 class="mb-4 d-flex justify-content-between align-items-center">
+                        Contacts
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createConversationModal">
+                            <i class="fas fa-plus"></i> Nouvelle conversation
+                        </button>
+                    </h5>
                     <div class="contacts-list">
                         @if (Model == null)
                         {
@@ -160,6 +161,65 @@ else
                 </div>
             </div>
         </div>
+
+        <!-- Fenêtre modale pour créer une conversation -->
+        <div class="modal fade" id="createConversationModal" tabindex="-1" aria-labelledby="createConversationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createConversationModalLabel">Créer une nouvelle conversation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email de l'utilisateur</label>
+                            <input type="email" class="form-control" id="userEmail" placeholder="Entrez l'email de l'utilisateur">
+                        </div>
+                        <div id="errorMessage" class="text-danger d-none"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="createConversationButton">Créer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script -->
+        <script>
+            document.getElementById("createConversationButton").addEventListener("click", async function () {
+                const email = document.getElementById("userEmail").value;
+                const errorMessage = document.getElementById("errorMessage");
+
+                if (!email) {
+                    errorMessage.textContent = "Veuillez entrer un email.";
+                    errorMessage.classList.remove("d-none");
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Conversation/Create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        location.reload(); // Rafraîchir les conversations sans recharger toute la page
+                    } else {
+                        errorMessage.textContent = result.message || "Une erreur s'est produite.";
+                        errorMessage.classList.remove("d-none");
+                    }
+                } catch (error) {
+                    errorMessage.textContent = "Erreur de connexion au serveur.";
+                    errorMessage.classList.remove("d-none");
+                }
+            });
+        </script>
     </body>
     </html>
 }
