@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 using WebappWhatsapp.Models;
 using User = WebappWhatsapp.Models.User;
 
@@ -85,7 +87,12 @@ namespace WebappWhatsapp.Controllers
 
             // Créez une nouvelle conversation
             var newConversation = new Conversation(new List<string> { currentUserEmail, request.Email });
-            await _cosmosDbService.AddItemAsync("Conversations", newConversation);
+
+            _logger.LogInformation("Document to insert: {Document}", JsonConvert.SerializeObject(newConversation));
+
+
+            await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.ConversationId);
+
 
             return Ok(new { message = "Conversation créée avec succès." });
         }

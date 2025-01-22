@@ -13,6 +13,7 @@ namespace WebappWhatsapp.Models
         Task AddUserAsync(User user); // Méthode pour ajouter un utilisateur
         Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query); // Méthode pour requêter des éléments
         Task AddItemAsync<T>(string containerName, T item); // Méthode pour ajouter un élément
+        Task AddItemWithPartitionKeyAsync<T>(string containerName, T item, string partitionKeyValue); // Méthode pour ajouter un élément avec clé de partition
     }
 
     // Implémentation du service Cosmos DB
@@ -85,7 +86,6 @@ namespace WebappWhatsapp.Models
             }
         }
 
-
         public async Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query)
         {
             var container = GetContainer(containerName); // Récupérer le conteneur correspondant
@@ -105,7 +105,18 @@ namespace WebappWhatsapp.Models
         public async Task AddItemAsync<T>(string containerName, T item)
         {
             var container = GetContainer(containerName); // Récupérer le conteneur correspondant
-            await container.CreateItemAsync(item, new PartitionKey(item.GetType().GetProperty("id")?.GetValue(item)?.ToString()));
+            await container.CreateItemAsync(item);
+        }
+
+        public async Task AddItemWithPartitionKeyAsync<T>(string containerName, T item, string partitionKeyValue)
+        {
+            if (string.IsNullOrEmpty(partitionKeyValue))
+            {
+                throw new ArgumentNullException(nameof(partitionKeyValue), "Partition key value cannot be null or empty.");
+            }
+
+            var container = GetContainer(containerName); // Récupérer le conteneur correspondant
+            await container.CreateItemAsync(item, new PartitionKey(partitionKeyValue));
         }
 
         // Méthode pour obtenir un conteneur spécifique
