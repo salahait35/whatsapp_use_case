@@ -1,165 +1,106 @@
-﻿@model WebappWhatsapp.Models.ChatViewModel
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f5f7;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-@{
-    ViewData["Title"] = "Messaging App";
-}
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-@if (Model == null)
-{
-    <div class="text-danger">Error: The model is null. Ensure the controller passes a valid model to the view.</div>
-}
-else
-{
-    <!-- Continue rendering the view -->
+        .chat-box {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            position: relative;
+        }
 
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
 
+        .message-input {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            width: 100%;
+            background-color: white;
+            border-top: 1px solid #ccc;
+        }
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>@ViewData["Title"]</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background-color: #f4f5f7;
-            }
-
-            .chat-container {
-                height: 100vh;
-            }
-
-            .contacts-list {
-                height: calc(100vh - 60px);
-                overflow-y: auto;
-            }
-
-            .chat-messages {
-                height: calc(100vh - 120px);
-                overflow-y: auto;
-            }
-
-            .message-input {
-                border-top: 1px solid #ccc;
+            .message-input input {
+                flex-grow: 1;
                 padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
             }
 
-            .message {
-                padding: 10px;
-                border-radius: 10px;
-                margin-bottom: 10px;
-            }
-
-            .message-sent {
+            .message-input button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
                 background-color: #007bff;
                 color: white;
-                align-self: flex-end;
+                cursor: pointer;
             }
 
-            .message-received {
-                background-color: #e9ecef;
-                align-self: flex-start;
-            }
-
-            .message-time {
-                font-size: 0.75rem;
-                color: #888;
-            }
-        </style>
-    </head>
-    <body>
-        <header class="bg-primary text-white p-3">
-            <div class="container-fluid d-flex justify-content-between align-items-center">
-                <h1 class="h5 mb-0">Messaging App</h1>
-                @if (Model?.CurrentUser?.Email != null)
-                {
-                    <p class="mb-0">Connected as: <strong>@Model.CurrentUser.Email</strong></p>
+                .message-input button:hover {
+                    background-color: #0056b3;
                 }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f4f5f7;
+            border-top: 1px solid #ccc;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-box">
+            <div class="chat-messages" id="messagesList">
+                <!-- Messages will be dynamically added here -->
             </div>
-        </header>
 
-        <div class="container-fluid chat-container">
-            <div class="row h-100">
-                <!-- Sidebar Contacts -->
-                <div class="col-md-4 bg-white p-3">
-                    <h5 class="mb-4">Contacts</h5>
-                    <div class="contacts-list">
-                        @if (Model == null)
-                        {
-                            <p class="text-danger">Error: The model is null. Please ensure the controller is passing a valid model to the view.</p>
-                        }
-                        else if (Model.Conversations == null)
-                        {
-                            <p class="text-warning">Warning: The Conversations list is null. Please check the initialization in the controller.</p>
-                        }
-                        else if (!Model.Conversations.Any())
-                        {
-                            <p class="text-muted">No conversations available.</p>
-                        }
-                        else
-                        {
-                            foreach (var conversation in Model.Conversations)
-                            {
-                                var lastMessage = conversation.LastMessage ?? "No messages yet";
-                                <div class="d-flex align-items-center p-2 border-bottom">
-                                    <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-3" width="50" height="50">
-                                    <div>
-                                        <p class="fw-bold mb-0">@string.Join(", ", conversation.Members)</p>
-                                        <p class="text-muted small mb-0">@lastMessage</p>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-
-                <!-- Chat Section -->
-                <div class="col-md-8 d-flex flex-column">
-                    <div class="chat-messages p-3 flex-grow-1">
-                        @if (Model == null)
-                        {
-                            <p class="text-danger">Error: The model is null. Please ensure the controller is passing a valid model to the view.</p>
-                        }
-                        else if (Model.Messages == null)
-                        {
-                            <p class="text-warning">Warning: The Messages list is null. Please check the initialization in the controller.</p>
-                        }
-                        else if (!Model.Messages.Any())
-                        {
-                            <p class="text-muted">No messages available.</p>
-                        }
-                        else
-                        {
-                            foreach (var message in Model.Messages)
-                            {
-                                var messageClass = message.SenderId == Model.CurrentUser.id ? "message-sent" : "message-received";
-                                var messageTime = message.LastMessageTimestamp.ToString("HH:mm");
-
-                                <div class="d-flex @messageClass mb-3">
-                                    @if (message.SenderId != Model.CurrentUser.id)
-                                    {
-                                        <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-2" width="40" height="40">
-                                    }
-                                    <div>
-                                        <p class="message @messageClass">@message.Content</p>
-                                        <p class="message-time text-muted">@messageTime</p>
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-
-                    <div class="message-input d-flex align-items-center">
-                        <input type="text" class="form-control form-control-lg me-2" placeholder="Type a message">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
+            <div class="message-input">
+                <input type="text" id="userInput" placeholder="Your name">
+                <input type="text" id="messageInput" placeholder="Your message">
+                <button id="sendButton">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
             </div>
         </div>
-    </body>
-    </html>
-}
+    </div>
+
+    <footer>
+        &copy; 2025 - WebappWhatsapp - <a href="#">Privacy</a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.1/signalr.min.js"></script>
+    <script src="/js/site.js"></script>
+</body>
+</html>

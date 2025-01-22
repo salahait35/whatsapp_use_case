@@ -1,13 +1,6 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using Microsoft.Azure.SignalR;
-using Microsoft.Azure.Cosmos;
-using WebappWhatsapp.Models;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,29 +19,25 @@ builder.Services.AddSingleton<ICosmosDbService>(sp =>
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
-builder.Services.AddControllersWithViews(options =>
+// Add Razor Pages and Identity UI
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
+
+builder.Services.AddAuthorization(options =>
 {
-    var policy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
+    options.FallbackPolicy = options.DefaultPolicy;
 });
-builder.Services.AddRazorPages()
-    .AddMicrosoftIdentityUI();
-builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]!);
-
-
-
-// Ajoute ici la configuration Cosmos DB
-
-
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -56,6 +45,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Add Authentication and Authorization Middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
