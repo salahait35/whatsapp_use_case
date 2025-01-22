@@ -39,7 +39,7 @@ namespace WebappWhatsapp.Controllers
             var model = new ChatViewModel
             {
                 CurrentUser = currentUser,
-                Conversations = GetConversationsForUser(currentUser.id),
+                Conversations = GetConversationsForUser(currentUser.Email),
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
