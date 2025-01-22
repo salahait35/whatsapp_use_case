@@ -6,8 +6,8 @@ namespace WebappWhatsapp.Models
 {
     public class Conversation
     {
-        [JsonProperty("conversationId")]
-        public string ConversationId { get; set; } = Guid.NewGuid().ToString(); // Utiliser conversationId comme clé unique et clé de partition
+        [JsonProperty("conversationId")] 
+        public string ConversationId { get; set; } = string.Empty; // Utiliser conversationId comme clé unique et clé de partition
 
         public string Type { get; set; } = "text"; // Par défaut : "text"
 
@@ -26,6 +26,7 @@ namespace WebappWhatsapp.Models
         // Constructeur avec paramètres
         public Conversation(List<string> members, string type = "text", string lastMessage = "No messages yet")
         {
+            ConversationId =  Guid.NewGuid().ToString();
             Members = members ?? throw new ArgumentNullException(nameof(members), "Members list cannot be null.");
             Type = type;
             LastMessage = lastMessage;
