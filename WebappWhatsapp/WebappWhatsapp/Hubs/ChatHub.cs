@@ -18,28 +18,37 @@ namespace WebappWhatsapp.Hubs
         // Method to send a message
         public async Task SendMessage(string senderId, string content, string conversationId)
         {
-            // Create a new message
+            Console.WriteLine($"SendMessage called with senderId: {senderId}, content: {content}, conversationId: {conversationId}");
+
+            if (string.IsNullOrEmpty(senderId) || string.IsNullOrEmpty(content) || string.IsNullOrEmpty(conversationId))
+            {
+                Console.WriteLine("Invalid input parameters. SenderId, Content, and ConversationId are required.");
+                throw new ArgumentException("SenderId, Content, and ConversationId must be provided.");
+            }
+
             var chatMessage = new Message
             {
                 ConversationId = conversationId,
                 SenderId = senderId,
                 Content = content,
                 LastMessageTimestamp = DateTime.UtcNow,
-                ReadBy = new List<string>() // Initialize an empty list
+                ReadBy = new List<string>() // Initialize with an empty list
             };
 
             try
             {
-                // Store the message in Cosmos DB
+                Console.WriteLine("Attempting to store message in Cosmos DB...");
                 await _cosmosDbService.AddMessageAsync(chatMessage);
+                Console.WriteLine("Message stored successfully in Cosmos DB.");
 
-                // Broadcast the message to all connected clients
+                Console.WriteLine("Broadcasting message to all connected clients...");
                 await Clients.All.SendAsync("ReceiveMessage", senderId, content, conversationId);
+                Console.WriteLine("Message broadcasted successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending message: {ex.Message}");
-                throw;
+                Console.WriteLine($"Error in SendMessage: {ex.Message}");
+                throw new HubException("An unexpected error occurred while processing your message.", ex);
             }
         }
 
@@ -48,14 +57,21 @@ namespace WebappWhatsapp.Hubs
         {
             try
             {
-                // Retrieve all messages from Cosmos DB
-                var messages = await _cosmosDbService.GetMessagesAsync();
+                if (string.IsNullOrEmpty(conversationId))
+                {
+                    Console.WriteLine("Invalid input: ConversationId is required.");
+                    throw new ArgumentException("ConversationId must be provided.");
+                }
 
-                // Filter messages by ConversationId
-                var filteredMessages = messages.Where(msg => msg.ConversationId == conversationId);
+                Console.WriteLine($"Retrieving messages for conversationId: {conversationId}");
+
+                // Retrieve messages for the specified conversationId
+                var messages = await _cosmosDbService.GetMessagesAsync(conversationId);
+
+                Console.WriteLine($"Retrieved {messages.Count()} messages for conversationId: {conversationId}");
 
                 // Send the filtered messages back to the requesting client
-                await Clients.Caller.SendAsync("LoadMessages", filteredMessages);
+                await Clients.Caller.SendAsync("LoadMessages", messages);
             }
             catch (Exception ex)
             {

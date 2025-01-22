@@ -16,7 +16,7 @@ namespace WebappWhatsapp.Models
         Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query); // Method to query items
         Task AddItemAsync<T>(string containerName, T item); // Method to add an item
         Task AddMessageAsync(Message message); // Method to add a message
-        Task<IEnumerable<Message>> GetMessagesAsync(); // Method to retrieve all messages
+        Task<IEnumerable<Message>> GetMessagesAsync(string conversationId); // Method to retrieve messages by conversation ID
     }
 
     // Implementation of the Cosmos DB service
@@ -103,16 +103,19 @@ namespace WebappWhatsapp.Models
             await container.CreateItemAsync(message, new PartitionKey(message.ConversationId));
         }
 
-        // Method to retrieve all messages
-        public async Task<IEnumerable<Message>> GetMessagesAsync()
+        // Method to retrieve messages by conversation ID
+        public async Task<IEnumerable<Message>> GetMessagesAsync(string conversationId)
         {
             var container = GetContainer("Messages");
-            var results = new List<Message>();
-            var query = container.GetItemQueryIterator<Message>();
+            var query = new QueryDefinition("SELECT * FROM c WHERE c.ConversationId = @conversationId")
+                .WithParameter("@conversationId", conversationId);
 
-            while (query.HasMoreResults)
+            var results = new List<Message>();
+            var queryIterator = container.GetItemQueryIterator<Message>(query);
+
+            while (queryIterator.HasMoreResults)
             {
-                var response = await query.ReadNextAsync();
+                var response = await queryIterator.ReadNextAsync();
                 results.AddRange(response);
             }
 

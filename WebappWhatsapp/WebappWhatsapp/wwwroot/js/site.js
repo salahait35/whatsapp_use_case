@@ -1,11 +1,10 @@
-﻿// Prevent duplicate declarations
-if (!window.connection) {
-    window.connection = new signalR.HubConnectionBuilder()
+﻿if (!window.signalRConnection) {
+    window.signalRConnection = new signalR.HubConnectionBuilder()
         .withUrl("/chatHub")
         .build();
 }
 
-const connection = window.connection;
+const connection = window.signalRConnection;
 
 connection.on("ReceiveMessage", (senderId, content, conversationId) => {
     const msg = `${senderId}: ${content}`;
@@ -25,12 +24,12 @@ connection.start()
     });
 
 document.getElementById("sendButton").addEventListener("click", async () => {
-    const senderId = document.getElementById("userInput").value;
-    const content = document.getElementById("messageInput").value;
+    const senderId = document.getElementById("userInput").value.trim();
+    const content = document.getElementById("messageInput").value.trim();
     const conversationId = "sample-conversation-id"; // Replace with actual logic
 
-    if (!connection || connection.state !== "Connected") {
-        console.error("Connection is not in the 'Connected' state.");
+    if (!senderId || !content || !conversationId) {
+        console.error("All fields are required to send a message.");
         return;
     }
 

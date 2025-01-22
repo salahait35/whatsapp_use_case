@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - main
+    - mathéo
 env:
   AZURE_WEBAPP_NAME: WebappWhatsapp20250121144040
   AZURE_WEBAPP_PACKAGE_PATH: WebappWhatsapp\published
