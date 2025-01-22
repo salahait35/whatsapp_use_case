@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using WebappWhatsapp.Models;
+using WebappWhatsapp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,14 +16,12 @@ builder.Services.AddSingleton<ICosmosDbService>(sp =>
     );
 });
 
-
-// Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
-// Add Razor Pages and Identity UI
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -42,13 +42,14 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-// Add Authentication and Authorization Middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map SignalR hub
+app.MapHub<ChatHub>("/chatHub");
+
+// Map Razor Pages and Controllers
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

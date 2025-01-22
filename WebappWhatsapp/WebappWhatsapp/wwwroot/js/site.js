@@ -1,48 +1,43 @@
-﻿(() => {
-    console.log("site.js is loaded");
-
-    const connection = new signalR.HubConnectionBuilder()
+﻿// Prevent duplicate declarations
+if (!window.connection) {
+    window.connection = new signalR.HubConnectionBuilder()
         .withUrl("/chatHub")
-        .configureLogging(signalR.LogLevel.Debug)
         .build();
+}
 
-    // Event handler for receiving messages
-    connection.on("ReceiveMessage", (user, message, conversationId) => {
-        const msg = `${user}: ${message}`;
-        const li = document.createElement("li");
-        li.textContent = msg;
-        document.getElementById("messagesList").appendChild(li);
+const connection = window.connection;
+
+connection.on("ReceiveMessage", (senderId, content, conversationId) => {
+    const msg = `${senderId}: ${content}`;
+    const li = document.createElement("li");
+    li.textContent = msg;
+    document.getElementById("messagesList").appendChild(li);
+});
+
+connection.start()
+    .then(() => {
+        console.log("SignalR connection established.");
+        document.getElementById("sendButton").disabled = false;
+    })
+    .catch(err => {
+        console.error("Error starting SignalR connection:", err);
+        document.getElementById("sendButton").disabled = true;
     });
 
-    // Event handler for loading all messages
-    connection.on("LoadMessages", (messages) => {
-        const messagesList = document.getElementById("messagesList");
-        messagesList.innerHTML = ""; // Clear existing messages
+document.getElementById("sendButton").addEventListener("click", async () => {
+    const senderId = document.getElementById("userInput").value;
+    const content = document.getElementById("messageInput").value;
+    const conversationId = "sample-conversation-id"; // Replace with actual logic
 
-        messages.forEach((msg) => {
-            const li = document.createElement("li");
-            li.textContent = `${msg.user}: ${msg.message}`;
-            messagesList.appendChild(li);
-        });
-    });
+    if (!connection || connection.state !== "Connected") {
+        console.error("Connection is not in the 'Connected' state.");
+        return;
+    }
 
-    // Start connection and load messages for a specific conversation
-    connection.start()
-        .then(() => {
-            console.log("SignalR connection started");
-            const conversationId = "DefaultConversation"; // Adjust as needed
-            connection.invoke("GetAllMessages", conversationId)
-                .catch(err => console.error(err.toString()));
-        })
-        .catch(err => console.error("Error starting SignalR connection:", err));
-
-    // Event listener for sending messages
-    document.getElementById("sendButton").addEventListener("click", () => {
-        const user = document.getElementById("userInput").value;
-        const message = document.getElementById("messageInput").value;
-        const conversationId = "DefaultConversation"; // Adjust as needed
-
-        connection.invoke("SendMessage", user, message, conversationId)
-            .catch(err => console.error("Error sending message:", err));
-    });
-})();
+    try {
+        await connection.invoke("SendMessage", senderId, content, conversationId);
+        console.log("Message sent successfully.");
+    } catch (err) {
+        console.error("Error sending message:", err);
+    }
+});
