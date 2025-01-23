@@ -40,6 +40,7 @@ terraform.rc
 template/.terraform.lock.hcl
 WebappWhatsapp/.vs/*
 WebappWhatsapp/WebappWhatsapp/.vs/*
+backend-whatsapp-use-case/.vs/*
 WebappWhatsapp/WebappWhatsapp/bin/*
 WebappWhatsapp/WebappWhatsapp/obj/*
 WebappWhatsapp/WebappWhatsapp/bin/Debug/net8.0/*

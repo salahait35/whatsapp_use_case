@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "fk+KySkhalXoPNwEzOm2aOIUlhcCEh64vfK2Ja3yCj0=",
+  "Source": "backend-whatsapp-use-case",
+  "BasePath": "_content/backend-whatsapp-use-case",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
