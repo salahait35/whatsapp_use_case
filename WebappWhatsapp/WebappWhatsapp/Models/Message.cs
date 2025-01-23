@@ -6,15 +6,14 @@ namespace WebappWhatsapp.Models
 {
     public class Message
     {
-        [JsonProperty("ConversationId")]
+        [JsonProperty("id")] // Correction : utiliser un nom JSON différent
         public string id { get; set; } = Guid.NewGuid().ToString();
-        public required string ConversationId { get; set; }
+
+        public required string ConversationId { get; set; } // Laissez ce nom tel quel
         public required string SenderId { get; set; }
         public required string Content { get; set; }
-
         public DateTime LastMessageTimestamp { get; set; }
-        public required List<string> ReadBy { get; set; } = new List<string>(); //TODO : check if we should use receiverid
-
+        public required List<string> ReadBy { get; set; } = new List<string>(); //TODO: Vérifiez si ReceiverId doit être utilisé
 
         public Message() { }
     }
