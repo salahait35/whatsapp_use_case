@@ -7,7 +7,7 @@ namespace WebappWhatsapp.Models
     public class Message
     {
         [JsonProperty("id")] // Correction : utiliser un nom JSON différent
-        public string id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public required string ConversationId { get; set; } // Laissez ce nom tel quel
         public required string SenderId { get; set; }
