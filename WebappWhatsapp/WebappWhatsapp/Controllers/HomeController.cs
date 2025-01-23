@@ -44,7 +44,7 @@ namespace WebappWhatsapp.Controllers
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
-            Console.WriteLine("Current user: " + model);
+            //Console.WriteLine("Current user: " + model);
 
             return View(model);
         }
