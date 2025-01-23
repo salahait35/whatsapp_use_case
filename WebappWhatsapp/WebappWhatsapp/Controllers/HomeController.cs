@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using WebappWhatsapp.Models;
@@ -39,18 +40,22 @@ namespace WebappWhatsapp.Controllers
             var model = new ChatViewModel
             {
                 CurrentUser = currentUser,
-                Conversations = GetConversationsForUser(currentUser.Email),
+                Conversations = await GetConversationsForUserAsync(currentUser.Email), // Appel asynchrone
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
             return View(model);
         }
 
-        private List<Conversation> GetConversationsForUser(string userId)
+        private async Task<List<Conversation>> GetConversationsForUserAsync(string email)
         {
-            var query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.members, '{userId}')";
-            return _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", query).Result.ToList();
+            var query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.members, @Email)";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@Email", email);
+
+            var results = await _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", queryDefinition.QueryText);
+            return results.ToList();
         }
+
 
         [HttpPost]
         [Route("Conversation/Create")]

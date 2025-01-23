@@ -87,13 +87,9 @@ else
                         </button>
                     </h5>
                     <div class="contacts-list">
-                        @if (Model == null)
+                        @if (Model?.Conversations == null)
                         {
-                            <p class="text-danger">Error: The model is null. Please ensure the controller is passing a valid model to the view.</p>
-                        }
-                        else if (Model.Conversations == null)
-                        {
-                            <p class="text-warning">Warning: The Conversations list is null. Please check the initialization in the controller.</p>
+                            <p class="text-danger">Error: The Conversations list is null or the model is not initialized properly.</p>
                         }
                         else if (!Model.Conversations.Any())
                         {
@@ -107,7 +103,16 @@ else
                                 <div class="d-flex align-items-center p-2 border-bottom">
                                     <img src="@Url.Content("~/images/default-avatar.png")" alt="avatar" class="rounded-circle me-3" width="50" height="50">
                                     <div>
-                                        <p class="fw-bold mb-0">@string.Join(", ", conversation.Members)</p>
+                                        <p class="fw-bold mb-0">
+                                            @if (conversation.Members != null)
+                                            {
+                                                @string.Join(", ", conversation.Members)
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger">Error: Members list is null.</span>
+                                            }
+                                        </p>
                                         <p class="text-muted small mb-0">@lastMessage</p>
                                     </div>
                                 </div>
