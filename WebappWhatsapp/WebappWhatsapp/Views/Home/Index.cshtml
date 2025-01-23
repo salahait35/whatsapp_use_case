@@ -74,7 +74,27 @@ else
                     <p class="mb-0">Connected as: <strong>@Model.CurrentUser.Email</strong></p>
                 }
             </div>
+            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#debugModal">
+                Debug Model JSON
+            </button>
         </header>
+
+        <div class="modal fade" id="debugModal" tabindex="-1" aria-labelledby="debugModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="debugModalLabel">Debug Model JSON</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre id="debugModelContent" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;"></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="container-fluid chat-container">
             <div class="row h-100">
@@ -225,6 +245,7 @@ else
                 }
             });
         </script>
+
     </body>
     </html>
 }
