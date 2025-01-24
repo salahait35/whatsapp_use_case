@@ -9,8 +9,8 @@ const msalConfig = {
   auth: {
     clientId: "a233eb7d-6818-49f9-9fd9-73bd7fce3e1b",
     authority: "https://whatsappissy.b2clogin.com/whatsappissy.onmicrosoft.com/B2C_1_susi",
-    redirectUri: window.location.origin, // Redirection après authentification
-    postLogoutRedirectUri: window.location.origin, // Redirection après déconnexion
+    redirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net/auth/callback", // Redirection après authentification
+    postLogoutRedirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net/auth/callback" // Redirection après déconnexion
   },
   cache: {
     cacheLocation: "localStorage", // Ou sessionStorage
