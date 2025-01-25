@@ -4,8 +4,8 @@ export const msalConfig = {
       authority: "https://whatsappissy.b2clogin.com/whatsappissy.onmicrosoft.com/b2c_1_susi",  // URL d'autorité spécifique à votre politique B2C
       knownAuthorities: ["whatsappissy.b2clogin.com"],  // Spécifiez l'autorité connue
       cloudDiscoveryMetadata: "",  // Laissez vide si vous ne l'utilisez pas
-      redirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net",  // URL de redirection après authentification
-      postLogoutRedirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net",  // URL de redirection après la déconnexion
+      redirectUri: "http://localhost:5173/",  // URL de redirection après authentification
+      postLogoutRedirectUri: "http://localhost:5173/",  // URL de redirection après la déconnexion
       navigateToLoginRequestUrl: true,
       clientCapabilities: ["CP1"],  // Ajoutez cette ligne si nécessaire
   },/*
