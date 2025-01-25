@@ -1,17 +1,11 @@
-import React from 'react';
-import { useMsal } from '@azure/msal-react';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
 
-  // Si aucun compte n'est trouvé, redirige vers la page de login
-  if (!accounts || accounts.length === 0) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Sinon, affiche les enfants (le contenu protégé)
-  return <>{children}</>;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
 };
 
 export default ProtectedRoute;
