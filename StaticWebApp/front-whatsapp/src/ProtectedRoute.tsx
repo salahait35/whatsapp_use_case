@@ -5,7 +5,11 @@ import { useIsAuthenticated } from "@azure/msal-react";
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuthenticated = useIsAuthenticated();
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;
