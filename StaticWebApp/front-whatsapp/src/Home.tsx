@@ -1,9 +1,14 @@
-import React from 'react';
-import { useAccount } from '@azure/msal-react';
+import React from "react";
+import { useAccount, useMsal } from "@azure/msal-react";
 
 const Home: React.FC = () => {
-  const account = useAccount();
-  
+  const { accounts } = useMsal();
+
+  // Récupérer les informations du premier compte authentifié
+  const account = useAccount(accounts[0] || null);
+
+
+
   return (
     <div>
       <h1>Bienvenue sur la page protégée !</h1>

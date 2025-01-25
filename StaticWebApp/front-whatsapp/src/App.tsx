@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom"; // Assure-toi d'utiliser BrowserRouter
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
-import Home from "./Home";
+import Home from "./Homepage";
 
 const App: React.FC = () => {
   const { instance, accounts } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Vérifie si l'instance MSAL est prête
     if (accounts.length > 0) {
       setIsAuthenticated(true);
     }
@@ -19,7 +20,7 @@ const App: React.FC = () => {
 
   const handleProtectedPage = () => {
     if (isAuthenticated) {
-      window.location.href = "/home"; // Utilisation de window.location pour la redirection
+      window.location.href = "/home";
     } else {
       handleLogin();
     }
@@ -32,7 +33,12 @@ const App: React.FC = () => {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/home" element={isAuthenticated ? <Home /> : <h1>Vous devez être connecté</h1>} />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? <Home /> : <h1>Vous devez être connecté</h1>
+            }
+          />
           <Route path="/" element={<h1>Page publique</h1>} />
         </Routes>
       </BrowserRouter>
