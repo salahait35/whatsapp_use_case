@@ -1,11 +1,11 @@
 export const msalConfig = {
   auth: {
-      clientId: "6f09c389-1173-4160-bcda-3a639239e4e8",  // Utilisez votre ClientId Azure AD B2C
+      clientId: "e8e9307e-d0be-42b1-9e56-3b9a09b4f719",  // Utilisez votre ClientId Azure AD B2C
       authority: "https://whatsappissy.b2clogin.com/whatsappissy.onmicrosoft.com/b2c_1_susi",  // URL d'autorité spécifique à votre politique B2C
       knownAuthorities: ["whatsappissy.b2clogin.com"],  // Spécifiez l'autorité connue
       cloudDiscoveryMetadata: "",  // Laissez vide si vous ne l'utilisez pas
-      redirectUri: "http://localhost:5173/",  // URL de redirection après authentification
-      postLogoutRedirectUri: "http://localhost:5173/",  // URL de redirection après la déconnexion
+      redirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net",  // URL de redirection après authentification
+      postLogoutRedirectUri: "https://yellow-flower-049eb5803.4.azurestaticapps.net",  // URL de redirection après la déconnexion
       navigateToLoginRequestUrl: true,
       clientCapabilities: ["CP1"],  // Ajoutez cette ligne si nécessaire
   },
