@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\backend-whatsapp-use-case.props" />
-</Project>
