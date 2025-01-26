@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 import Home from "./Homepage";
+import './App.css';
 
 const App: React.FC = () => {
   const { instance, accounts } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Vérifie si l'instance MSAL est prête
+    // Vérifie si l'utilisateur est connecté
     if (accounts.length > 0) {
       setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
     }
   }, [accounts]);
 
@@ -18,31 +21,28 @@ const App: React.FC = () => {
     instance.loginRedirect().catch((e) => console.error(e));
   };
 
-  const handleProtectedPage = () => {
-    if (isAuthenticated) {
-      window.location.href = "/home";
-    } else {
-      handleLogin();
-    }
-  };
-
   return (
-    <div>
-      <button onClick={handleLogin}>Connexion</button>
-      <button onClick={handleProtectedPage}>Accéder à la page protégée</button>
-
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/home"
-            element={
-              isAuthenticated ? <Home /> : <h1>Vous devez être connecté</h1>
-            }
-          />
-          <Route path="/" element={<h1>Page publique</h1>} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Redirection automatique vers Home */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/home" replace />
+            ) : (
+              handleLogin() || <h1>Connexion en cours...</h1>
+            )
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            isAuthenticated ? <Home /> : <Navigate to="/" replace />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
