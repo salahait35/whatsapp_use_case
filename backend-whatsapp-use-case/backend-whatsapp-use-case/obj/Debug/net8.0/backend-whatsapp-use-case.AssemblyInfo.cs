@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("backend-whatsapp-use-case")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eebf1311c5054da086ea34f9b2fc360bf0eb3c49")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a098423d1c4c64fd4aab14cc07505d6037894919")]
 [assembly: System.Reflection.AssemblyProductAttribute("backend-whatsapp-use-case")]
 [assembly: System.Reflection.AssemblyTitleAttribute("backend-whatsapp-use-case")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

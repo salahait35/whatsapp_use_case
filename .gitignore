@@ -44,4 +44,16 @@ backend-whatsapp-use-case/.vs/*
 WebappWhatsapp/WebappWhatsapp/bin/*
 WebappWhatsapp/WebappWhatsapp/obj/*
 WebappWhatsapp/WebappWhatsapp/bin/Debug/net8.0/*
+#API
+backend-whatsapp-use-case/backend-whatsapp-use-case/bin/*
+backend-whatsapp-use-case/backend-whatsapp-use-case/obj/*
+backend-whatsapp-use-case/backend-whatsapp-use-case/obj
+backend-whatsapp-use-case/backend-whatsapp-use-case/bin/Debug/net8.0/*
+backend-whatsapp-use-case/.vs/*
+backend-whatsapp-use-case/backend-whatsapp-use-case/.vs/*
 
+backend-whatsapp-use-case
+*.exe
+backend-whatsapp-use-case/backend-whatsapp-use-case/bin/Debug/net8.0/backend-whatsapp-use-case.pdb
+backend-whatsapp-use-case/backend-whatsapp-use-case/obj/Debug/net8.0/backend-whatsapp-use-case.dll
+backend-whatsapp-use-case/backend-whatsapp-use-case/obj/*
