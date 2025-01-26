@@ -1,3 +1,8 @@
 {
-  "dependencies": {}
+  "dependencies": {
+    "cosmosdb1": {
+      "type": "cosmosdb",
+      "connectionId": "ConnectionStrings:CosmosDBConnection"
+    }
+  }
 }

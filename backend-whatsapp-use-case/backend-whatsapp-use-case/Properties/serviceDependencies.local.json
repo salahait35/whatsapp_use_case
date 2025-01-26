@@ -1,3 +1,11 @@
 {
-  "dependencies": {}
+  "dependencies": {
+    "cosmosdb1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.ServiceLinker/locations/francecentral/connectors/ConnectionStringsCosmosDBConnection_4D7643056C",
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.DocumentDB/databaseAccounts/whatsappwebappcosmos",
+      "type": "cosmosdb.azure",
+      "connectionId": "ConnectionStrings:CosmosDBConnection"
+    }
+  }
 }

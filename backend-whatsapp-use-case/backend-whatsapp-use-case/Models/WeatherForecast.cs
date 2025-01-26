@@ -1,4 +1,4 @@
-namespace backend_whatsapp_use_case
+namespace backend_whatsapp_use_case.Models
 {
     public class WeatherForecast
     {

@@ -1,4 +1,25 @@
 {
-  "dependencies": {},
-  "parameters": {}
+  "dependencies": {
+    "cosmosdb1": {
+      "restored": true,
+      "restoreTime": "2025-01-26T22:17:45.2857547Z"
+    }
+  },
+  "parameters": {
+    "cosmosdb1.subscriptionId": {
+      "Name": "cosmosdb1.subscriptionId",
+      "Type": "subscription",
+      "Value": "1d874ea7-d53d-4cef-9987-572bff2963ba"
+    },
+    "cosmosdb1.serviceConnectorResourceGroupName": {
+      "Name": "cosmosdb1.serviceConnectorResourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    },
+    "cosmosdb1.resourceGroupName": {
+      "Name": "cosmosdb1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "rg-whatsapp-use-case"
+    }
+  }
 }

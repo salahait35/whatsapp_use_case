@@ -4,7 +4,7 @@ using Microsoft.Identity.Web.Resource;
 
 namespace backend_whatsapp_use_case.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [ApiController]
     [Route("[controller]")]
     [RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
