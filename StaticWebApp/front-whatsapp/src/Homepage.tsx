@@ -1,17 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
+import { useMsal } from "@azure/msal-react";
 import "./Home.css";
 
 const Home: React.FC = () => {
+  const { instance, accounts } = useMsal();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleLogout = () => {
+    instance.logoutRedirect().catch((e) => console.error(e));
+  };
+
+  const handleNewConversation = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setEmail("");
+  };
+
+  const handleAddConversation = () => {
+    console.log("Nouvelle conversation avec :", email);
+    setIsModalOpen(false);
+    setEmail("");
+    // Ajoute ici la logique pour créer une nouvelle conversation
+  };
+
   return (
     <div className="home-container">
       {/* Header */}
       <header className="header">
         <h1>Messaging App</h1>
         <div className="header-right">
-          <span className="user-name">User: user@example.com</span>
-          <button className="logout-button">Logout</button>
+          <span className="user-name">{accounts[0]?.username || "Invité"}</span>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </header>
+
+      {/* Modale pour ajouter une nouvelle conversation */}
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Nouvelle conversation</h2>
+            <input
+              type="email"
+              placeholder="Adresse email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <div className="modal-buttons">
+            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleAddConversation}>Add</button>
+              
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="main-content">
@@ -19,7 +67,9 @@ const Home: React.FC = () => {
         <aside className="sidebar">
           <div className="sidebar-header">
             <h2>Conversations</h2>
-            <button className="add-conversation-button">+ New</button>
+            <button className="add-conversation-button" onClick={handleNewConversation}>
+              + New
+            </button>
           </div>
           <ul className="conversation-list">
             <li className="conversation-item">John Doe</li>

@@ -9,6 +9,7 @@ export const msalConfig = {
       navigateToLoginRequestUrl: true,
       clientCapabilities: ["CP1"],  // Ajoutez cette ligne si nécessaire
   },/*
+  
   cache: {
       cacheLocation: "sessionStorage",  // Stockage temporaire de la session
       temporaryCacheLocation: "sessionStorage",  // Cache temporaire pour cette session

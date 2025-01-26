@@ -1,3 +1,5 @@
+#conf for azure so do not touch
+./src/authConfig.ts
 # Logs
 logs
 *.log
