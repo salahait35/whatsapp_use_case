@@ -4,12 +4,12 @@
       "type": "signalr",
       "connectionId": "Azure:SignalR:ConnectionString"
     },
-    "identityapp1": {
-      "type": "identityapp"
-    },
     "cosmosdb1": {
       "type": "cosmosdb",
       "connectionId": "ConnectionStrings:CosmosDBConnection"
+    },
+    "identityapp1": {
+      "type": "identityapp"
     }
   }
 }
