@@ -3,7 +3,6 @@ using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Threading.Tasks;
 
 namespace WebappWhatsapp.Models
@@ -23,14 +22,10 @@ namespace WebappWhatsapp.Models
         private readonly Dictionary<string, Container> _containers;
         private readonly string _databaseName;
 
-        public CosmosDbService(string accountEndpoint, string databaseName, Dictionary<string, string> containerNames)
+        public CosmosDbService(CosmosClient cosmosClient, string databaseName, Dictionary<string, string> containerNames)
         {
             if (containerNames == null)
                 throw new ArgumentNullException(nameof(containerNames));
-
-            // Utilisation d'un jeton AAD via DefaultAzureCredential
-            var aadCredential = new DefaultAzureCredential();
-            var cosmosClient = new CosmosClient(accountEndpoint, aadCredential);
 
             _databaseName = databaseName;
             _containers = new Dictionary<string, Container>();
@@ -117,7 +112,6 @@ namespace WebappWhatsapp.Models
             }
 
             var container = GetContainer(containerName); // Récupérer le conteneur correspondant
-            Console.WriteLine(item);
             await container.CreateItemAsync(item, new PartitionKey(partitionKeyValue));
         }
 

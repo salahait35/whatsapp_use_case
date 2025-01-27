@@ -58,7 +58,6 @@ namespace WebappWhatsapp.Controllers
             return results.ToList();
         }
 
-
         [HttpPost]
         [Route("Conversation/Create")]
         public async Task<IActionResult> CreateConversationAsync([FromBody] CreateConversationRequest request)
@@ -97,9 +96,7 @@ namespace WebappWhatsapp.Controllers
 
             _logger.LogInformation("Document to insert: {Document}", JsonConvert.SerializeObject(newConversation));
 
-
             await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.id);
-
 
             return Ok(new { message = "Conversation créée avec succès." });
         }
@@ -126,6 +123,12 @@ namespace WebappWhatsapp.Controllers
 
             await _cosmosDbService.AddItemAsync("Users", newUser);
             return newUser;
+        }
+
+        public async Task<IActionResult> GetAllUsersAsync()
+        {
+            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", "SELECT * FROM c");
+            return Ok(users);
         }
 
         public IActionResult Privacy()

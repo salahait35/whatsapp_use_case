@@ -1,3 +1,4 @@
+using backend_whatsapp_use_case.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;

@@ -1,8 +1,23 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
-
+using WebappWhatsapp.Models;
+using Azure.Identity;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Cosmos DB client with Managed Identity
+builder.Services.AddSingleton<ICosmosDbService>(sp =>
+{
+    var containerNames = builder.Configuration.GetSection("CosmosDb:Containers").Get<Dictionary<string, string>>();
+    var cosmosClient = new CosmosClient(builder.Configuration["CosmosDb:AccountEndpoint"], new DefaultAzureCredential());
+    return new CosmosDbService(
+        cosmosClient,
+        builder.Configuration["CosmosDb:DatabaseName"],
+        containerNames
+    );
+});
 
 // Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
