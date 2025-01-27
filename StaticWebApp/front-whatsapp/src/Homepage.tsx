@@ -12,9 +12,7 @@ const Home: React.FC = () => {
     instance.logoutRedirect().catch((e) => console.error(e));
   };
 
-  const handleNewConversation = () => {
-    setIsModalOpen(true);
-  };
+  const handleNewConversation = () => setIsModalOpen(true);
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -25,7 +23,6 @@ const Home: React.FC = () => {
     console.log("Nouvelle conversation avec :", email);
     setIsModalOpen(false);
     setEmail("");
-    // Ajoute ici la logique pour créer une nouvelle conversation
   };
 
   return (
@@ -41,7 +38,7 @@ const Home: React.FC = () => {
         </div>
       </header>
 
-      {/* Modale pour ajouter une nouvelle conversation */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -53,9 +50,8 @@ const Home: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <div className="modal-buttons">
-            <button onClick={handleCancel}>Cancel</button>
-            <button onClick={handleAddConversation}>Add</button>
-              
+              <button onClick={handleCancel}>Cancel</button>
+              <button onClick={handleAddConversation}>Add</button>
             </div>
           </div>
         </div>
@@ -63,11 +59,13 @@ const Home: React.FC = () => {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Sidebar Conversations */}
         <aside className="sidebar">
           <div className="sidebar-header">
             <h2>Conversations</h2>
-            <button className="add-conversation-button" onClick={handleNewConversation}>
+            <button
+              className="add-conversation-button"
+              onClick={handleNewConversation}
+            >
               + New
             </button>
           </div>
@@ -77,7 +75,6 @@ const Home: React.FC = () => {
           </ul>
         </aside>
 
-        {/* Chat Section */}
         <section className="chat-section">
           <div className="chat-messages">
             <div className="message received">
