@@ -1,42 +1,31 @@
-﻿if (!window.signalRConnection) {
-    window.signalRConnection = new signalR.HubConnectionBuilder()
+﻿if (!window.connection) {
+    window.connection = new signalR.HubConnectionBuilder()
         .withUrl("/chatHub")
         .build();
 }
 
-const connection = window.signalRConnection;
+const connection = window.connection;
 
-connection.on("ReceiveMessage", (senderId, content, conversationId) => {
-    const msg = `${senderId}: ${content}`;
-    const li = document.createElement("li");
-    li.textContent = msg;
-    document.getElementById("messagesList").appendChild(li);
+// Ensure the connection starts correctly
+connection.start()
+    .then(() => console.log("SignalR connection established."))
+    .catch(err => console.error("Error starting SignalR connection:", err));
+
+// Handle reconnection
+connection.onclose(async () => {
+    console.log("Connection lost. Attempting to reconnect...");
+    await connection.start();
+    console.log("Reconnected to SignalR.");
 });
 
-connection.start()
-    .then(() => {
-        console.log("SignalR connection established.");
-        document.getElementById("sendButton").disabled = false;
-    })
-    .catch(err => {
-        console.error("Error starting SignalR connection:", err);
-        document.getElementById("sendButton").disabled = true;
-    });
-
+// Example of checking the connection state before sending
 document.getElementById("sendButton").addEventListener("click", async () => {
-    const senderId = document.getElementById("userInput").value.trim();
-    const content = document.getElementById("messageInput").value.trim();
-    const conversationId = "sample-conversation-id"; // Replace with actual logic
-
-    if (!senderId || !content || !conversationId) {
-        console.error("All fields are required to send a message.");
+    if (connection.state !== signalR.HubConnectionState.Connected) {
+        console.error("Connection is not active.");
         return;
     }
-
-    try {
-        await connection.invoke("SendMessage", senderId, content, conversationId);
-        console.log("Message sent successfully.");
-    } catch (err) {
-        console.error("Error sending message:", err);
-    }
+    const senderId = "example-sender";
+    const content = "Hello!";
+    const conversationId = "example-conversation";
+    await connection.invoke("SendMessage", senderId, content, conversationId);
 });

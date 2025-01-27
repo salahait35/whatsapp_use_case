@@ -1,11 +1,20 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.Azure.SignalR;
 using WebappWhatsapp.Models;
-using WebappWhatsapp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+
+// Configure CosmosDbService with container names
 builder.Services.AddSingleton<ICosmosDbService>(sp =>
 {
     var containerNames = builder.Configuration.GetSection("CosmosDb:Containers").Get<Dictionary<string, string>>();
@@ -15,26 +24,33 @@ builder.Services.AddSingleton<ICosmosDbService>(sp =>
         containerNames
     );
 });
+builder.Services.AddSignalR(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromMinutes(2);
+    options.ClientTimeoutInterval = TimeSpan.FromMinutes(3);
+});
 
+// Configure authentication and authorization
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
-builder.Services.AddSignalR();
-
-builder.Services.AddAuthorization(options =>
+builder.Services.AddControllersWithViews(options =>
 {
-    options.FallbackPolicy = options.DefaultPolicy;
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
 });
 
+builder.Services.AddRazorPages()
+    .AddMicrosoftIdentityUI();
+
+builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]);
+
+// Build the app
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -46,13 +62,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map SignalR hub
-app.MapHub<ChatHub>("/chatHub");
-
-// Map Razor Pages and Controllers
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

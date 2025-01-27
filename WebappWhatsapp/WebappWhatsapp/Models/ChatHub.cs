@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebappWhatsapp.Models;
 
-namespace WebappWhatsapp.Hubs
+namespace WebappWhatsapp.Models
 {
     public class ChatHub : Hub
     {
