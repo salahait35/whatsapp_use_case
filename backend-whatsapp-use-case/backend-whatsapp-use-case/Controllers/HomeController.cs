@@ -138,12 +138,13 @@ namespace WebappWhatsapp.Controllers
         }
 
 
-        [AllowAnonymous]
+        [Authorize]
 
         [HttpGet]
         [Route("getallusers")]
         public async Task<IActionResult> GetAllUsersAsync()
         {
+            Console.Write("zebi");
             var users = await _cosmosDbService.QueryItemsAsync<User>("Users", "SELECT * FROM c");
             return Ok(users);
         }

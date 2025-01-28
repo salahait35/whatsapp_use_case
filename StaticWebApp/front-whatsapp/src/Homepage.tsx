@@ -39,7 +39,7 @@ const Home: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      // Obtenir le jeton d'accès
+      // Obtenir le jeton d'accès https://stackoverflow.com/questions/74746377/getting-access-token-from-azure-ad-from-react-frontend
       const request = {
         scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"], // Remplace par le scope de ton API
         account: accounts[0]
