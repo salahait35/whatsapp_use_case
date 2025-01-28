@@ -12,6 +12,7 @@
   "dependencies": {
     "@azure/msal-browser": "^4.0.2",
     "@azure/msal-react": "^3.0.2",
+    "@microsoft/signalr": "^8.0.7",
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/vite": "^4.0.0",
     "components": "^0.1.0",

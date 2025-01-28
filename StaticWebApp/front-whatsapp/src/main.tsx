@@ -10,11 +10,12 @@ const msalInstance = new PublicClientApplication(msalConfig);
 
 const Root: React.FC = () => {
   const { instance, accounts } = useMsal();
-  const account = useAccount(accounts[0] || null); // Récupère l'utilisateur connecté
+  const account = useAccount(accounts[0] || null);
   const [msalInitialized, setMsalInitialized] = useState(false);
+  const [message, setMessage] = useState<string | null>(null); // Message state
 
   useEffect(() => {
-    // Initialisation explicite de MSAL
+    // Initialize MSAL
     instance
       .initialize()
       .then(() => setMsalInitialized(true))
@@ -23,10 +24,39 @@ const Root: React.FC = () => {
 
   useEffect(() => {
     if (msalInitialized && !account) {
-      // Redirige l'utilisateur si MSAL est initialisé et qu'il n'est pas authentifié
       instance.loginRedirect().catch((e) => console.error("Erreur de redirection :", e));
     }
   }, [msalInitialized, account, instance]);
+
+  useEffect(() => {
+    // Mock SignalR functionality
+    const fakeSignalR = {
+      on(event: string, callback: (msg: string) => void) {
+        if (event === "ReceiveMessage") {
+          // Simulate receiving a message after 3 seconds
+          setTimeout(() => {
+            callback("This is a test message from the mocked SignalR connection!");
+          }, 3000);
+        }
+      },
+      off(event: string) {
+        console.log(`Disconnected from event: ${event}`);
+      },
+    };
+
+    // Simulate SignalR connection
+    fakeSignalR.on("ReceiveMessage", (msg: string) => {
+      setMessage(msg); // Display received message
+    });
+
+    return () => {
+      fakeSignalR.off("ReceiveMessage"); // Cleanup
+    };
+  }, [msalInitialized, account]);
+
+  const closeNotification = () => {
+    setMessage(null); // Clear the message
+  };
 
   if (!msalInitialized) {
     return (
@@ -44,7 +74,17 @@ const Root: React.FC = () => {
     );
   }
 
-  return <Home />;
+  return (
+    <>
+      <Home />
+      {message && (
+        <div className="notification">
+          <p>{message}</p>
+          <button onClick={closeNotification}>Fermer</button>
+        </div>
+      )}
+    </>
+  );
 };
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
