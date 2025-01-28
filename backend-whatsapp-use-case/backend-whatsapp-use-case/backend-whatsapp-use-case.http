@@ -1,6 +1,5 @@
-@backend_whatsapp_use_case_HostAddress = http://localhost:5244
+@backend_whatsapp_use_case_HostAddress = http://localhost:7042
 
-GET {{backend_whatsapp_use_case_HostAddress}}/weatherforecast/
+GET{{backend_whatsapp_use_case_HostAddress}}/getallusers
 Accept: application/json
-
 ###

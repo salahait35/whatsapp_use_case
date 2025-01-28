@@ -124,13 +124,7 @@ namespace WebappWhatsapp.Controllers
             await _cosmosDbService.AddItemAsync("Users", newUser);
             return newUser;
         }
-
-        public async Task<IActionResult> GetAllUsersAsync()
-        {
-            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", "SELECT * FROM c");
-            return Ok(users);
-        }
-
+        
         public IActionResult Privacy()
         {
             return View();
@@ -142,6 +136,18 @@ namespace WebappWhatsapp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        [AllowAnonymous]
+
+        [HttpGet]
+        [Route("getallusers")]
+        public async Task<IActionResult> GetAllUsersAsync()
+        {
+            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", "SELECT * FROM c");
+            return Ok(users);
+        }
+
     }
 
     public class CreateConversationRequest

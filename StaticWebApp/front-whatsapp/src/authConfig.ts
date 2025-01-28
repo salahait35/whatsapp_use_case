@@ -8,6 +8,7 @@ export const msalConfig = {
       postLogoutRedirectUri: "http://localhost:5173/",  // URL de redirection après la déconnexion
       navigateToLoginRequestUrl: true,
       clientCapabilities: ["CP1"],  // Ajoutez cette ligne si nécessaire
+      tenantId: "98a36095-ba04-4fed-85fc-d4c844826790"
   },/*
   
   cache: {
@@ -18,6 +19,10 @@ export const msalConfig = {
       claimsBasedCachingEnabled: true,  // Active le cache basé sur les revendications
   },
   */
+
+  
+    scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+
   telemetry: {
       application: {
           appName: "My Application",  // Nom de l'application
