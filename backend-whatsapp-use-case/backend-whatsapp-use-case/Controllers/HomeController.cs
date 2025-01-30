@@ -77,6 +77,29 @@ namespace WebappWhatsapp.Controllers
             return results.ToList();
         }
 
+
+        [HttpGet]
+        [Route("api/conversations/{conversationId}/messages")]
+        public async Task<IActionResult> GetMessagesForConversationAsyncAPI(string conversationId)
+        {
+            if (string.IsNullOrEmpty(conversationId))
+            {
+                return BadRequest(new { message = "L'identifiant de la conversation est requis." });
+            }
+
+            var messages = await GetMessagesForConversationAsync(conversationId);
+            return Ok(messages);
+        }
+
+        private async Task<List<Message>> GetMessagesForConversationAsync(string conversationId)
+        {
+            var query = $"SELECT * FROM c WHERE c.conversationId = '{conversationId}' ORDER BY c.timestamp ASC";
+
+            var results = await _cosmosDbService.QueryItemsAsync<Message>("Messages", query);
+            return results.ToList();
+        }
+
+
         [HttpPost]
         [Route("Conversation/Create")]
         public async Task<IActionResult> CreateConversationAsync([FromBody] CreateConversationRequest request)
