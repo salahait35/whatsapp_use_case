@@ -77,6 +77,49 @@ namespace WebappWhatsapp.Controllers
             return results.ToList();
         }
 
+        [HttpPost]
+        [Route("api/conversations/{conversationId}/send_message")]
+        public async Task<IActionResult> SendMessageAsync(string conversationId, [FromBody] Message message)
+        {
+            if (string.IsNullOrEmpty(conversationId))
+            {
+                return BadRequest(new { message = "L'identifiant de la conversation est requis." });
+            }
+
+            if (message == null)
+            {
+                return BadRequest(new { message = "Le message est requis." });
+            }
+
+            if (string.IsNullOrEmpty(message.SenderId))
+            {
+                return BadRequest(new { message = "L'identifiant de l'expéditeur est requis." });
+            }
+
+            if (string.IsNullOrEmpty(message.Content))
+            {
+                return BadRequest(new { message = "Le contenu du message est requis." });
+            }
+
+            message.ConversationId = conversationId;
+            message.Timestamp = DateTime.UtcNow;
+            message.Id = Guid.NewGuid().ToString();
+
+            try
+            {
+                await _cosmosDbService.AddItemAsync("Messages", message);
+                return Ok(message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de l'envoi du message.", details = ex.Message });
+            }
+        }
+
+
+
+
+
 
         [HttpGet]
         [Route("api/conversations/{conversationId}/messages")]

@@ -10,6 +10,8 @@ const Home: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [conversations, setConversations] = useState<any[]>([]);
   const [conversation, setConversation] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState(""); // Nouvel état pour le message à envoyer
   const [error, setError] = useState<string | null>(null);
 
   const currentAccount = accounts[0];
@@ -21,7 +23,7 @@ const Home: React.FC = () => {
   const getOrCreateUser = async () => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"], // Remplace par le scope de ton API
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
         account: currentAccount
       };
 
@@ -35,9 +37,9 @@ const Home: React.FC = () => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}` // Ajouter le jeton d'accès dans l'en-tête
+          'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ Email: email_to_send }) // Assure-toi que l'email est correctement envoyé
+        body: JSON.stringify({ Email: email_to_send })
       });
 
       if (!apiResponse.ok) {
@@ -46,8 +48,7 @@ const Home: React.FC = () => {
 
       const data = await apiResponse.json();
       setUser(data);
-      console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-      console.log(user.id); // Affiche les informations de l'utilisateur dans la console
+      console.log(user.id);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
     }
@@ -56,7 +57,7 @@ const Home: React.FC = () => {
   const getConversations = async () => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"], // Remplace par le scope de ton API
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
         account: currentAccount
       };
 
@@ -68,7 +69,7 @@ const Home: React.FC = () => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}` // Ajouter le jeton d'accès dans l'en-tête
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
@@ -78,7 +79,7 @@ const Home: React.FC = () => {
 
       const data = await apiResponse.json();
       setConversations(data);
-      console.log(data); // Affiche les informations des conversations dans la console
+      console.log(data);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
     }
@@ -87,7 +88,7 @@ const Home: React.FC = () => {
   const createConversation = async () => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"], // Remplace par le scope de ton API
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
         account: currentAccount
       };
 
@@ -99,9 +100,9 @@ const Home: React.FC = () => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}` // Ajouter le jeton d'accès dans l'en-tête
+          'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ Email: email }) // Assure-toi que l'email est correctement envoyé
+        body: JSON.stringify({ Email: email })
       });
 
       if (!apiResponse.ok) {
@@ -114,8 +115,8 @@ const Home: React.FC = () => {
       const data = await apiResponse.json();
       setConversation(data);
       setError(null);
-      setIsModalOpen(false); // Ferme le modal seulement si la conversation est créée avec succès
-      console.log(data); // Affiche les informations de la conversation dans la console
+      setIsModalOpen(false);
+      console.log(data);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
       setError('Failed to create conversation');
@@ -123,10 +124,85 @@ const Home: React.FC = () => {
     }
   };
 
+  const getMessages = async (conversationId: string) => {
+    try {
+      const request = {
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        account: currentAccount
+      };
+
+      const response = await instance.acquireTokenSilent(request);
+      const accessToken = response.accessToken;
+
+      const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversationId}/messages`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await apiResponse.json();
+      setMessages(data);
+      console.log(data);
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    try {
+      const request = {
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        account: currentAccount
+      };
+
+      const response = await instance.acquireTokenSilent(request);
+      const accessToken = response.accessToken;
+
+      const message = {
+        conversationId: conversation.id,
+        senderId: user.id,
+        messageText: newMessage,
+        timestamp: new Date().toISOString(),
+        readStatus: {},
+        deleted: false
+      };
+
+      const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversation.id}/send_message`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify(message)
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await apiResponse.json();
+      setMessages([...messages, data]);
+      setNewMessage("");
+      console.log(data);
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
   useEffect(() => {
     getOrCreateUser();
     getConversations();
-  }, []); // Appelle getOrCreateUser et getConversations au démarrage de la page
+  }, []);
 
   const handleNewConversation = () => setIsModalOpen(true);
 
@@ -151,7 +227,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container">
-      {/* Header */}
       <header className="header">
         <h1>Messaging App</h1>
         <div className="header-right">
@@ -162,7 +237,6 @@ const Home: React.FC = () => {
         </div>
       </header>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -182,7 +256,6 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
       <div className="main-content">
         <aside className="sidebar">
           <div className="sidebar-header">
@@ -196,7 +269,7 @@ const Home: React.FC = () => {
           </div>
           <ul className="conversation-list">
             {conversations.map((conversation) => (
-              <li key={conversation.id} className="conversation-item">
+              <li key={conversation.id} className="conversation-item" onClick={() => getMessages(conversation.id)}>
                 {conversation.participants.join(", ")}
               </li>
             ))}
@@ -205,22 +278,22 @@ const Home: React.FC = () => {
 
         <section className="chat-section">
           <div className="chat-messages">
-            <div className="message received">
-              <p className="message-text">Hi! How are you?</p>
-              <span className="message-time">10:30 AM</span>
-            </div>
-            <div className="message sent">
-              <p className="message-text">I'm good, thanks!</p>
-              <span className="message-time">10:32 AM</span>
-            </div>
+            {messages.map((message) => (
+              <div key={message.id} className={`message ${message.senderId === user?.id ? 'sent' : 'received'}`}>
+                <p className="message-text">{message.messageText}</p>
+                <span className="message-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
+              </div>
+            ))}
           </div>
           <div className="message-input-container">
             <input
               type="text"
               placeholder="Type a message..."
               className="message-input"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
             />
-            <button className="send-button">Send</button>
+            <button className="send-button" onClick={sendMessage}>Send</button>
           </div>
         </section>
       </div>
