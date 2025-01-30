@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using WebappWhatsapp.Models;
 using User = WebappWhatsapp.Models.User;
@@ -44,17 +44,36 @@ namespace WebappWhatsapp.Controllers
                 Messages = new List<Message>() // Initialisez la liste pour éviter des erreurs
             };
 
-            //Console.WriteLine("Current user: " + model);
-
             return View(model);
+        }
+
+        [HttpGet]
+        [Route("api/conversations")]
+        public async Task<IActionResult> GetConversationsForUserApiAsync()
+        {
+            // Récupérer l'email de l'utilisateur connecté
+            var email = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
+
+            _logger.LogInformation("pour récup les conv", JsonConvert.SerializeObject(email));
+            _logger.LogInformation("pour récup les conv" +(email));
+
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest(new { message = "Impossible de récupérer l'utilisateur connecté." });
+            }
+
+            var conversations = await GetConversationsForUserAsync(email);
+            return Ok(conversations);
         }
 
         private async Task<List<Conversation>> GetConversationsForUserAsync(string email)
         {
-            var query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.members, @Email)";
-            var queryDefinition = new QueryDefinition(query).WithParameter("@Email", email);
+            var query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.participants,'{email}')";
 
-            var results = await _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", queryDefinition.QueryText);
+
+
+            var results = await _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", query);
             return results.ToList();
         }
 
@@ -66,6 +85,8 @@ namespace WebappWhatsapp.Controllers
             {
                 return BadRequest(new { message = "L'email est requis." });
             }
+
+            _logger.LogInformation("Received request for conv: {Request}", JsonConvert.SerializeObject(request.Email));
 
             // Récupérer l'utilisateur connecté
             var currentUserEmail = User.Claims.FirstOrDefault(c => c.Type == "emails")?.Value;
@@ -82,9 +103,10 @@ namespace WebappWhatsapp.Controllers
                 return BadRequest(new { message = "Aucun utilisateur trouvé avec cet email." });
             }
 
+
             // Vérifiez si une conversation existe déjà
             var conversations = await _cosmosDbService.QueryItemsAsync<Conversation>("Conversations",
-                $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.members, '{currentUserEmail}') AND ARRAY_CONTAINS(c.members, '{request.Email}')");
+                $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.participants, '{currentUserEmail}') AND ARRAY_CONTAINS(c.participants, '{request.Email}')");
 
             if (conversations.Any())
             {
@@ -96,9 +118,31 @@ namespace WebappWhatsapp.Controllers
 
             _logger.LogInformation("Document to insert: {Document}", JsonConvert.SerializeObject(newConversation));
 
-            await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.id);
+            await _cosmosDbService.AddItemWithPartitionKeyAsync("Conversations", newConversation, newConversation.Id);
 
-            return Ok(new { message = "Conversation créée avec succès." });
+            return Ok(newConversation);
+        }
+
+
+        [HttpPost]
+        [Route("api/user/getorcreate")]
+        public async Task<IActionResult> GetOrCreateUserApiAsync([FromBody] EmailRequest request)
+        {
+            _logger.LogInformation("Received request: {Request}", JsonConvert.SerializeObject(request));
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                _logger.LogWarning("Email is missing in the request.");
+                return BadRequest(new { message = "L'email est requis." });
+            }
+
+            _logger.LogInformation("Email received: {Email}", request.Email);
+
+            var user = await GetOrCreateUserAsync(request.Email);
+
+            _logger.LogInformation("User retrieved or created: {User}", JsonConvert.SerializeObject(user));
+
+            return Ok(user);
         }
 
         public async Task<User> GetOrCreateUserAsync(string email)
@@ -124,7 +168,7 @@ namespace WebappWhatsapp.Controllers
             await _cosmosDbService.AddItemAsync("Users", newUser);
             return newUser;
         }
-        
+
         public IActionResult Privacy()
         {
             return View();
@@ -137,21 +181,22 @@ namespace WebappWhatsapp.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
         [Authorize]
-
         [HttpGet]
         [Route("getallusers")]
         public async Task<IActionResult> GetAllUsersAsync()
         {
-            Console.Write("zebi");
             var users = await _cosmosDbService.QueryItemsAsync<User>("Users", "SELECT * FROM c");
             return Ok(users);
         }
-
     }
 
     public class CreateConversationRequest
+    {
+        public string Email { get; set; }
+    }
+
+    public class EmailRequest
     {
         public string Email { get; set; }
     }

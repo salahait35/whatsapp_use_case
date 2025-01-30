@@ -69,12 +69,12 @@ namespace WebappWhatsapp.Models
                 }
 
                 // Ajouter un nouvel utilisateur si aucun utilisateur n'a été trouvé
-                if (string.IsNullOrEmpty(user.id))
+                if (string.IsNullOrEmpty(user.Id))
                 {
-                    user.id = Guid.NewGuid().ToString(); // Générer un ID unique si non défini
+                    user.Id = Guid.NewGuid().ToString(); // Générer un ID unique si non défini
                 }
 
-                await container.CreateItemAsync(user, new PartitionKey(user.id));
+                await container.CreateItemAsync(user, new PartitionKey(user.Id));
             }
             catch (CosmosException ex)
             {
