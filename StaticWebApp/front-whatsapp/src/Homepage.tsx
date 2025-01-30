@@ -48,11 +48,21 @@ const Home: React.FC = () => {
 
       const data = await apiResponse.json();
       setUser(data);
-      console.log(user.id);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      console.log(user.id);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    getOrCreateUser();
+    getConversations();
+  }, []);
 
   const getConversations = async () => {
     try {
@@ -149,6 +159,7 @@ const Home: React.FC = () => {
 
       const data = await apiResponse.json();
       setMessages(data);
+      setConversation(conversations.find(conv => conv.id === conversationId)); // Mettre à jour l'état de la conversation
       console.log(data);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
@@ -170,7 +181,7 @@ const Home: React.FC = () => {
       const message = {
         conversationId: conversation.id,
         senderId: user.id,
-        messageText: newMessage,
+        Content: newMessage,
         timestamp: new Date().toISOString(),
         readStatus: {},
         deleted: false
@@ -198,11 +209,6 @@ const Home: React.FC = () => {
       console.error('There was a problem with the fetch operation:', error);
     }
   };
-
-  useEffect(() => {
-    getOrCreateUser();
-    getConversations();
-  }, []);
 
   const handleNewConversation = () => setIsModalOpen(true);
 
@@ -280,7 +286,7 @@ const Home: React.FC = () => {
           <div className="chat-messages">
             {messages.map((message) => (
               <div key={message.id} className={`message ${message.senderId === user?.id ? 'sent' : 'received'}`}>
-                <p className="message-text">{message.messageText}</p>
+                <p className="message-text">{message.content}</p>
                 <span className="message-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
               </div>
             ))}

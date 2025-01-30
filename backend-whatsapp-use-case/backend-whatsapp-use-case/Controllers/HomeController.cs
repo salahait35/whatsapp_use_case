@@ -202,11 +202,11 @@ namespace WebappWhatsapp.Controllers
                 return BadRequest(new { message = "L'email est requis." });
             }
 
-            _logger.LogInformation("Email received: {Email}", request.Email);
+            _logger.LogInformation("Email received poooooooour ça : {Email}", request.Email);
 
             var user = await GetOrCreateUserAsync(request.Email);
 
-            _logger.LogInformation("User retrieved or created: {User}", JsonConvert.SerializeObject(user));
+            _logger.LogInformation("User retrieved or creasssssssssssssssssssssssssssssssssssssssssssssted: {User}", JsonConvert.SerializeObject(user));
 
             return Ok(user);
         }
