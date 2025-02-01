@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
+import { generateKeyPair, encryptMessage, decryptMessage } from "./cryptoUtils";
 import "./Home.css";
 
 const Home: React.FC = () => {
@@ -13,6 +14,8 @@ const Home: React.FC = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState(""); // Nouvel état pour le message à envoyer
   const [error, setError] = useState<string | null>(null);
+  const [keysGenerated, setKeysGenerated] = useState(false); // État pour suivre si les clés ont été générées
+  const [isCreatingUser, setIsCreatingUser] = useState(false); // État pour éviter les appels multiples
 
   const currentAccount = accounts[0];
 
@@ -20,7 +23,7 @@ const Home: React.FC = () => {
     instance.logoutRedirect().catch((e) => console.error(e));
   };
 
-  const getOrCreateUser = async () => {
+  const userExists = async (email: string) => {
     try {
       const request = {
         scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
@@ -30,16 +33,14 @@ const Home: React.FC = () => {
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
 
-      const email_to_send = currentAccount?.username;
-
-      const apiResponse = await fetch('https://localhost:7042/api/user/getorcreate', {
+      const apiResponse = await fetch('https://localhost:7042/api/user/exists', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ Email: email_to_send })
+        body: JSON.stringify({ Email: email })
       });
 
       if (!apiResponse.ok) {
@@ -47,9 +48,96 @@ const Home: React.FC = () => {
       }
 
       const data = await apiResponse.json();
-      setUser(data);
+      return data.exists;
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
+      return false;
+    }
+  };
+
+  const createUser = async (email: string, publicKey: JsonWebKey) => {
+    try {
+      const request = {
+        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        account: currentAccount
+      };
+
+      const response = await instance.acquireTokenSilent(request);
+      const accessToken = response.accessToken;
+
+      const apiResponse = await fetch('https://localhost:7042/api/user/create', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ Email: email, PublicKey: JSON.stringify(publicKey) })
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const newUser = await apiResponse.json();
+      return newUser;
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+      return null;
+    }
+  };
+
+  const getOrCreateUser = async () => {
+    if (isCreatingUser) return; // Éviter les appels multiples
+    setIsCreatingUser(true);
+
+    try {
+      const email_to_send = currentAccount?.username;
+
+      const exists = await userExists(email_to_send);
+
+      if (exists) {
+        // L'utilisateur existe, récupérer les informations de l'utilisateur
+        const request = {
+          scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+          account: currentAccount
+        };
+
+        const response = await instance.acquireTokenSilent(request);
+        const accessToken = response.accessToken;
+
+        const apiResponse = await fetch('https://localhost:7042/api/user/getorcreate', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ Email: email_to_send })
+        });
+
+        if (!apiResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await apiResponse.json();
+        setUser(data);
+      } else if (!keysGenerated) {
+        // L'utilisateur n'existe pas et les clés n'ont pas encore été générées
+        const { publicKeyJwk, privateKeyJwk } = await generateKeyPair(email_to_send);
+
+        // Créer un nouvel utilisateur avec la clé publique
+        const newUser = await createUser(email_to_send, publicKeyJwk);
+
+        if (newUser) {
+          setUser(newUser);
+          setKeysGenerated(true); // Marquer les clés comme générées
+        }
+      }
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    } finally {
+      setIsCreatingUser(false);
     }
   };
 
@@ -126,6 +214,7 @@ const Home: React.FC = () => {
       setConversation(data);
       setError(null);
       setIsModalOpen(false);
+      getConversations(); // Mettre à jour la liste des conversations
       console.log(data);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
@@ -237,9 +326,7 @@ const Home: React.FC = () => {
         <h1>Messaging App</h1>
         <div className="header-right">
           <span className="user-name">{currentAccount?.username || "Invité"}</span>
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
+          <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
       </header>
 

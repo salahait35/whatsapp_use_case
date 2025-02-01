@@ -12,14 +12,18 @@ namespace WebappWhatsapp.Models
         public string Email { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Email { get; set; }
 
         [JsonProperty("username")]
-        public string Username { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
+
+        [JsonProperty("publickey")]
+        public string PublicKey { get; set; } = string.Empty;
 
         // Constructeur avec paramètres
-        public User(string id, string email, string username)
+        public User(string id, string email, string username, string publickey)
         {
             Id = id;
             Email = email;
-            Username = username; //TODO check if required
+            Username = username; 
+            PublicKey = publickey;
         }
 
         // Constructeur par défaut
@@ -28,6 +32,7 @@ namespace WebappWhatsapp.Models
             Id = Guid.NewGuid().ToString();
             Email = string.Empty;
             Username = string.Empty;
+            PublicKey = string.Empty;
         }
     }
 }
