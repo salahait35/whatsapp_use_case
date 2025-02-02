@@ -18,6 +18,12 @@ namespace WebappWhatsapp.Models
         [JsonProperty("timestamp")]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow; // Timestamp actuel
 
+        [JsonProperty("participantKeys")]
+        public Dictionary<string, string> ParticipantKeys { get; set; } = new Dictionary<string, string>();
+
+        [JsonProperty("encryptedSymmetricKeys")]
+        public Dictionary<string, string> EncryptedSymmetricKeys { get; set; } = new Dictionary<string, string>();
+
         // Constructeur par défaut
         public Conversation()
         {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
-import { generateKeyPair, encryptMessage, decryptMessage } from "./cryptoUtils";
-import "./Home.css";
+import { generateKeyPair, encryptMessage, decryptMessage, generateSymmetricKey, encryptSymmetricKey, encryptMessageWithSymmetricKey, decryptMessageWithSymmetricKey, decryptSymmetricKey } from "./cryptoUtils";import "./Home.css";
 
 const Home: React.FC = () => {
   const { instance, accounts } = useMsal();
@@ -16,6 +15,7 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [keysGenerated, setKeysGenerated] = useState(false); // État pour suivre si les clés ont été générées
   const [isCreatingUser, setIsCreatingUser] = useState(false); // État pour éviter les appels multiples
+  const [privateKeyJwk, setPrivateKeyJwk] = useState<JsonWebKey | null>(null); // État pour la clé privée
 
   const currentAccount = accounts[0];
 
@@ -132,6 +132,7 @@ const Home: React.FC = () => {
         if (newUser) {
           setUser(newUser);
           setKeysGenerated(true); // Marquer les clés comme générées
+          localStorage.setItem('privateKeyJwk', JSON.stringify(privateKeyJwk)); // Enregistrer la clé privée dans le localStorage
         }
       }
     } catch (error) {
@@ -189,11 +190,33 @@ const Home: React.FC = () => {
         scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
         account: currentAccount
       };
-
+  
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
-
-      const apiResponse = await fetch('https://localhost:7042/Conversation/Create', {
+  
+      // Récupérer la clé publique de l'utilisateur actuel
+      const currentUserPublicKeyResponse = await fetch('https://localhost:7042/api/user/getpublickey', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ Email: currentAccount.username })
+      });
+  
+      if (!currentUserPublicKeyResponse.ok) {
+        const errorData = await currentUserPublicKeyResponse.json();
+        setError(errorData.message);
+        setConversation(null);
+        return;
+      }
+  
+      const currentUserPublicKeyData = await currentUserPublicKeyResponse.json();
+      const currentUserPublicKey = JSON.parse(currentUserPublicKeyData.publicKey);
+  
+      // Récupérer la clé publique de l'utilisateur cible
+      const targetUserPublicKeyResponse = await fetch('https://localhost:7042/api/user/getpublickey', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -202,14 +225,51 @@ const Home: React.FC = () => {
         },
         body: JSON.stringify({ Email: email })
       });
-
+  
+      if (!targetUserPublicKeyResponse.ok) {
+        const errorData = await targetUserPublicKeyResponse.json();
+        setError(errorData.message);
+        setConversation(null);
+        return;
+      }
+  
+      const targetUserPublicKeyData = await targetUserPublicKeyResponse.json();
+      const targetUserPublicKey = JSON.parse(targetUserPublicKeyData.publicKey);
+  
+      // Générer la clé symétrique
+      const symmetricKey = await generateSymmetricKey();
+  
+      // Chiffrer la clé symétrique avec les clés publiques des participants
+      const encryptedSymmetricKeys: { [key: string]: string } = {};
+      const participants = {
+        [currentAccount.username]: currentUserPublicKey,
+        [email]: targetUserPublicKey
+      };
+  
+      for (const participant in participants) {
+        const publicKeyJwk = participants[participant];
+        console.log("1 :", JSON.stringify(publicKeyJwk));
+        const encryptedKey = await encryptSymmetricKey(symmetricKey, publicKeyJwk);
+        encryptedSymmetricKeys[participant] = btoa(String.fromCharCode(...new Uint8Array(encryptedKey)));
+      }
+  
+      const apiResponse = await fetch('https://localhost:7042/Conversation/Create', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ Email: email, EncryptedSymmetricKeys: encryptedSymmetricKeys })
+      });
+  
       if (!apiResponse.ok) {
         const errorData = await apiResponse.json();
         setError(errorData.message);
         setConversation(null);
         return;
       }
-
+  
       const data = await apiResponse.json();
       setConversation(data);
       setError(null);
@@ -225,57 +285,106 @@ const Home: React.FC = () => {
 
   const getMessages = async (conversationId: string) => {
     try {
-      const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
-        account: currentAccount
-      };
+        const request = {
+            scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+            account: currentAccount
+        };
 
-      const response = await instance.acquireTokenSilent(request);
-      const accessToken = response.accessToken;
+        const response = await instance.acquireTokenSilent(request);
+        const accessToken = response.accessToken;
 
-      const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversationId}/messages`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
+        const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversationId}/messages`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!apiResponse.ok) {
+            throw new Error('Network response was not ok');
         }
-      });
 
-      if (!apiResponse.ok) {
-        throw new Error('Network response was not ok');
-      }
+        const data = await apiResponse.json();
+        console.log(data);
 
-      const data = await apiResponse.json();
-      setMessages(data);
-      setConversation(conversations.find(conv => conv.id === conversationId)); // Mettre à jour l'état de la conversation
-      console.log(data);
+        // Mettre à jour l'état de la conversation avant d'accéder à ses propriétés
+        const currentConversation = conversations.find(conv => conv.id === conversationId);
+        setConversation(currentConversation);
+
+        if (!currentConversation) {
+            throw new Error('Conversation not found');
+        }
+
+        // Récupérer la clé symétrique chiffrée et la déchiffrer
+        const encryptedSymmetricKey = currentConversation.encryptedSymmetricKeys[currentAccount.username];
+        const privateKeyJwkString = localStorage.getItem('privateKeyJwk');
+
+        console.log(privateKeyJwkString);
+
+        if (!privateKeyJwkString) {
+            throw new Error('Private key not found. Please import your private key.');
+        }
+        const privateKeyJwk = JSON.parse(privateKeyJwkString);
+        const symmetricKey = await decryptSymmetricKey(privateKeyJwk, encryptedSymmetricKey);
+
+        // Déchiffrer les messages avec la clé symétrique
+        const decryptedMessages = await Promise.all(data.map(async (message: any) => {
+            const encryptedMessage = Uint8Array.from(atob(message.content), c => c.charCodeAt(0)).buffer;
+            const iv = Uint8Array.from(atob(message.iv), c => c.charCodeAt(0));
+            const decryptedContent = await decryptMessageWithSymmetricKey(symmetricKey, encryptedMessage, iv);
+            return { ...message, content: decryptedContent };
+        }));
+
+        setMessages(decryptedMessages);
+        console.log(decryptedMessages);
     } catch (error) {
-      console.error('There was a problem with the fetch operation:', error);
+        console.error('There was a problem with the fetch operation:', error);
     }
-  };
+};
 
+function isBase64(str: string) {
+  try {
+      return btoa(atob(str)) === str;
+  } catch (err) {
+      return false;
+  }
+}
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
-
+  
     try {
       const request = {
         scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
         account: currentAccount
       };
-
+  
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
-
+  
+      // Récupérer la clé symétrique chiffrée et la déchiffrer
+      const encryptedSymmetricKey = conversation.encryptedSymmetricKeys[currentAccount.username];
+      const privateKeyJwkString = localStorage.getItem('privateKeyJwk');
+      if (!privateKeyJwkString) {
+        throw new Error('Private key not found. Please import your private key.');
+      }
+      const privateKeyJwk = JSON.parse(privateKeyJwkString);
+      const symmetricKey = await decryptSymmetricKey(privateKeyJwk, encryptedSymmetricKey);
+  
+      // Chiffrer le message avec la clé symétrique
+      const { encryptedMessage, iv } = await encryptMessageWithSymmetricKey(symmetricKey, newMessage);
+      console.log(iv)
       const message = {
         conversationId: conversation.id,
         senderId: user.id,
-        Content: newMessage,
+        Content: btoa(String.fromCharCode(...new Uint8Array(encryptedMessage))), // Convertir en base64
+        iv: btoa(String.fromCharCode(...new Uint8Array(iv))), // Convertir en base64
         timestamp: new Date().toISOString(),
         readStatus: {},
         deleted: false
       };
-
+  
       const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversation.id}/send_message`, {
         method: 'POST',
         headers: {
@@ -285,11 +394,11 @@ const Home: React.FC = () => {
         },
         body: JSON.stringify(message)
       });
-
+  
       if (!apiResponse.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const data = await apiResponse.json();
       setMessages([...messages, data]);
       setNewMessage("");
@@ -318,6 +427,19 @@ const Home: React.FC = () => {
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
+  };
+
+  const handlePrivateKeyImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        localStorage.setItem('privateKeyJwk', content);
+        setPrivateKeyJwk(JSON.parse(content));
+      };
+      reader.readAsText(file[0]);
+    }
   };
 
   return (
@@ -387,6 +509,14 @@ const Home: React.FC = () => {
               onChange={(e) => setNewMessage(e.target.value)}
             />
             <button className="send-button" onClick={sendMessage}>Send</button>
+          </div>
+          <div className="private-key-import">
+            <label htmlFor="private-key-file">Import Private Key:</label>
+            <input
+              type="file"
+              id="private-key-file"
+              onChange={handlePrivateKeyImport}
+            />
           </div>
         </section>
       </div>

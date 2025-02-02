@@ -57,7 +57,6 @@ namespace WebappWhatsapp.Controllers
             _logger.LogInformation("pour récup les conv", JsonConvert.SerializeObject(email));
             _logger.LogInformation("pour récup les conv" + (email));
 
-
             if (string.IsNullOrEmpty(email))
             {
                 return BadRequest(new { message = "Impossible de récupérer l'utilisateur connecté." });
@@ -70,10 +69,13 @@ namespace WebappWhatsapp.Controllers
         private async Task<List<Conversation>> GetConversationsForUserAsync(string email)
         {
             var query = $"SELECT * FROM c WHERE ARRAY_CONTAINS(c.participants,'{email}')";
-
             var results = await _cosmosDbService.QueryItemsAsync<Conversation>("Conversations", query);
-            return results.ToList();
+            var conversations = results.ToList();
+
+
+            return conversations;
         }
+
 
         [HttpPost]
         [Route("api/conversations/{conversationId}/send_message")]
@@ -98,7 +100,11 @@ namespace WebappWhatsapp.Controllers
             {
                 return BadRequest(new { message = "Le contenu du message est requis." });
             }
-
+            if (string.IsNullOrEmpty(message.Iv))
+            {
+                return BadRequest(new { message = "Le iv du message est requis." });
+            }
+            
             message.ConversationId = conversationId;
             message.Timestamp = DateTime.UtcNow;
             message.Id = Guid.NewGuid().ToString();
@@ -154,7 +160,7 @@ namespace WebappWhatsapp.Controllers
             }
 
             // Vérifiez si l'utilisateur avec cet email existe
-            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", $"SELECT * FROM c WHERE c.Email = '{request.Email}'");
+            var users = await _cosmosDbService.QueryItemsAsync<User>("Users", $"SELECT * FROM c WHERE c.email = '{request.Email}'");
             var selectedUser = users.FirstOrDefault();
             if (selectedUser == null)
             {
@@ -171,7 +177,10 @@ namespace WebappWhatsapp.Controllers
             }
 
             // Créez une nouvelle conversation
-            var newConversation = new Conversation(new List<string> { currentUserEmail, request.Email });
+            var newConversation = new Conversation(new List<string> { currentUserEmail, request.Email })
+            {
+                EncryptedSymmetricKeys = request.EncryptedSymmetricKeys
+            };
 
             _logger.LogInformation("Document to insert: {Document}", JsonConvert.SerializeObject(newConversation));
 
@@ -204,7 +213,7 @@ namespace WebappWhatsapp.Controllers
         public async Task<User> GetOrCreateUserAsync(string email, string publicKey = null)
         {
             // Recherchez l'utilisateur par e-mail dans Cosmos DB
-            var query = $"SELECT * FROM c WHERE c.Email = '{email}'";
+            var query = $"SELECT * FROM c WHERE c.email = '{email}'";
             var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
 
             // Vérifiez si un utilisateur existe
@@ -257,6 +266,33 @@ namespace WebappWhatsapp.Controllers
             var query = $"SELECT * FROM c WHERE c.email = '{email}'";
             var users = await _cosmosDbService.QueryItemsAsync<User>("Users", query);
             return users.FirstOrDefault();
+        }
+
+
+        [HttpPost]
+        [Route("api/user/getpublickey")]
+        public async Task<IActionResult> GetPublicKeyAsync([FromBody] UserRequest request)
+        {
+            _logger.LogInformation("Received request to get public key: {Request}", JsonConvert.SerializeObject(request));
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                _logger.LogWarning("Email is missing in the request.");
+                return BadRequest(new { message = "L'email est requis." });
+            }
+
+            _logger.LogInformation("Email received: {Email}", request.Email);
+
+            var user = await GetUserByEmailAsync(request.Email);
+
+            if (user != null)
+            {
+                _logger.LogInformation("User found: {User}", JsonConvert.SerializeObject(user));
+                return Ok(new { PublicKey = user.PublicKey });
+            }
+
+            _logger.LogInformation("User not found.");
+            return NotFound(new { message = "Utilisateur non trouvé." });
         }
 
         [HttpPost]
@@ -319,11 +355,14 @@ namespace WebappWhatsapp.Controllers
     public class CreateConversationRequest
     {
         public string Email { get; set; }
+
+        public Dictionary<string, string> EncryptedSymmetricKeys { get; set; }
     }
 
     public class UserRequest
     {
         public string Email { get; set; }
         public string PublicKey { get; set; }
+
     }
 }

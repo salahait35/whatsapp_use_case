@@ -1,5 +1,3 @@
-// cryptoUtils.ts
-
 export async function generateKeyPair(username: string) {
   const keyPair = await window.crypto.subtle.generateKey({
     name: "RSA-OAEP",
@@ -79,4 +77,108 @@ export async function decryptMessage(privateKeyJwk: JsonWebKey, encryptedMessage
 
   // Décoder le message en texte
   return new TextDecoder().decode(decryptedMessage);
+}
+
+export async function generateSymmetricKey(): Promise<CryptoKey> {
+  const key = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 256,
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+  return key;
+}
+
+export async function encryptSymmetricKey(symmetricKey: CryptoKey, publicKeyJwk: JsonWebKey): Promise<ArrayBuffer> {
+  const publicKey = await window.crypto.subtle.importKey(
+    "jwk",
+    publicKeyJwk,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256",
+    },
+    true,
+    ["encrypt"]
+  );
+
+  const exportedKey = await window.crypto.subtle.exportKey("raw", symmetricKey);
+  const encryptedKey = await window.crypto.subtle.encrypt(
+    {
+      name: "RSA-OAEP",
+    },
+    publicKey,
+    exportedKey
+  );
+
+  return encryptedKey;
+}
+
+export async function encryptMessageWithSymmetricKey(symmetricKey: CryptoKey, message: string): Promise<{ encryptedMessage: ArrayBuffer, iv: Uint8Array }> {
+  const encodedMessage = new TextEncoder().encode(message);
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const encryptedMessage = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    symmetricKey,
+    encodedMessage
+  );
+
+  return { encryptedMessage, iv };
+}
+
+export async function decryptMessageWithSymmetricKey(symmetricKey: CryptoKey, encryptedMessage: ArrayBuffer, iv: Uint8Array): Promise<string> {
+  const decryptedMessage = await window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
+    symmetricKey,
+    encryptedMessage
+  );
+
+  return new TextDecoder().decode(decryptedMessage);
+}
+
+
+export async function decryptSymmetricKey(privateKeyJwk: JsonWebKey, encryptedSymmetricKey: string): Promise<CryptoKey> {
+  // Importer la clé privée
+  const privateKey = await window.crypto.subtle.importKey(
+    "jwk",
+    privateKeyJwk,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256",
+    },
+    true,
+    ["decrypt"]
+  );
+
+  // Convertir la clé symétrique chiffrée de base64 en ArrayBuffer
+  const encryptedKeyArrayBuffer = Uint8Array.from(atob(encryptedSymmetricKey), c => c.charCodeAt(0)).buffer;
+
+  // Déchiffrer la clé symétrique
+  const decryptedKey = await window.crypto.subtle.decrypt(
+    {
+      name: "RSA-OAEP",
+    },
+    privateKey,
+    encryptedKeyArrayBuffer
+  );
+
+  // Importer la clé symétrique déchiffrée
+  const symmetricKey = await window.crypto.subtle.importKey(
+    "raw",
+    decryptedKey,
+    {
+      name: "AES-GCM",
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+
+  return symmetricKey;
 }

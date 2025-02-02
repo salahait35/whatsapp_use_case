@@ -18,6 +18,12 @@ namespace WebappWhatsapp.Models
         [JsonProperty("messageText")]
         public string Content { get; set; }
 
+        [JsonProperty("encryptedContent")]
+        public string EncryptedContent { get; set; }
+
+        [JsonProperty("iv")]
+        public string Iv { get; set; }
+
         [JsonProperty("timestamp")]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
@@ -31,12 +37,14 @@ namespace WebappWhatsapp.Models
         public Message() { }
 
         // Constructeur avec paramètres
-        public Message(string conversationId, string senderId, string content)
+        public Message(string conversationId, string senderId, string content, string encryptedContent, string iv)
         {
             Id = Guid.NewGuid().ToString();
             ConversationId = conversationId ?? throw new ArgumentNullException(nameof(conversationId), "ConversationId cannot be null.");
             SenderId = senderId ?? throw new ArgumentNullException(nameof(senderId), "SenderId cannot be null.");
             Content = content ?? throw new ArgumentNullException(nameof(content), "Content cannot be null.");
+            EncryptedContent = encryptedContent ?? throw new ArgumentNullException(nameof(encryptedContent), "EncryptedContent cannot be null.");
+            Iv = iv ?? throw new ArgumentNullException(nameof(iv), "Iv cannot be null.");
             Timestamp = DateTime.UtcNow;
             ReadStatus = new Dictionary<string, bool>();
             Deleted = false;
