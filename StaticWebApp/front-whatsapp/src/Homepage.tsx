@@ -26,7 +26,7 @@ const Home: React.FC = () => {
   const userExists = async (email: string) => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
         account: currentAccount
       };
 
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
   const createUser = async (email: string, publicKey: JsonWebKey) => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
         account: currentAccount
       };
 
@@ -99,7 +99,7 @@ const Home: React.FC = () => {
       if (exists) {
         // L'utilisateur existe, récupérer les informations de l'utilisateur
         const request = {
-          scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+          scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
           account: currentAccount
         };
 
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
   const getConversations = async () => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
         account: currentAccount
       };
 
@@ -186,7 +186,7 @@ const Home: React.FC = () => {
   const createConversation = async () => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
         account: currentAccount
       };
   
@@ -285,7 +285,7 @@ const Home: React.FC = () => {
   const getMessages = async (conversationId: string) => {
     try {
         const request = {
-            scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+            scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
             account: currentAccount
         };
 
@@ -349,7 +349,7 @@ const Home: React.FC = () => {
   
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
         account: currentAccount
       };
   

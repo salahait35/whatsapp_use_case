@@ -1,6 +1,6 @@
 export const msalConfig = {
   auth: {
-      clientId: "b6f86ce7-1ca1-498f-be34-351a385d41e4",//"ffef2490-f249-40a4-a713-61dc878a157a" pour localhost,  // Utilisez votre ClientId Azure AD B2C
+      clientId: "ed465e2d-4a05-4265-b2e2-960133c6c32a",//"ffef2490-f249-40a4-a713-61dc878a157a" pour localhost,  // Utilisez votre ClientId Azure AD B2C
       authority: "https://whatsappissy.b2clogin.com/whatsappissy.onmicrosoft.com/b2c_1_susi",  // URL d'autorité spécifique à votre politique B2C
       knownAuthorities: ["whatsappissy.b2clogin.com"],  // Spécifiez l'autorité connue
       cloudDiscoveryMetadata: "",  // Laissez vide si vous ne l'utilisez pas
