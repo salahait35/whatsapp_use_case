@@ -399,10 +399,11 @@ function isBase64(str: string) {
         throw new Error('Network response was not ok');
       }
   
-      const data = await apiResponse.json();
+/*      const data = await apiResponse.json();
       setMessages([...messages, data]);
       setNewMessage("");
-      console.log(data);
+      console.log(data);*/
+      getMessages(conversation.id) //TODO a changer c'est DEGEULASSE
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
     }
