@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMsal } from "@azure/msal-react";
-import { generateKeyPair, encryptMessage, decryptMessage, generateSymmetricKey, encryptSymmetricKey, encryptMessageWithSymmetricKey, decryptMessageWithSymmetricKey, decryptSymmetricKey } from "./cryptoUtils";import "./Home.css";
+import { generateKeyPair, generateSymmetricKey, encryptSymmetricKey, encryptMessageWithSymmetricKey, decryptMessageWithSymmetricKey, decryptSymmetricKey } from "./cryptoUtils";import "./Home.css";
 
 const Home: React.FC = () => {
   const { instance, accounts } = useMsal();
@@ -125,7 +125,6 @@ const Home: React.FC = () => {
       } else if (!keysGenerated) {
         // L'utilisateur n'existe pas et les clés n'ont pas encore été générées
         const { publicKeyJwk, privateKeyJwk } = await generateKeyPair(email_to_send);
-
         // Créer un nouvel utilisateur avec la clé publique
         const newUser = await createUser(email_to_send, publicKeyJwk);
 
@@ -344,13 +343,7 @@ const Home: React.FC = () => {
     }
 };
 
-function isBase64(str: string) {
-  try {
-      return btoa(atob(str)) === str;
-  } catch (err) {
-      return false;
-  }
-}
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
   
@@ -438,6 +431,7 @@ function isBase64(str: string) {
         const content = e.target?.result as string;
         localStorage.setItem('privateKeyJwk', content);
         setPrivateKeyJwk(JSON.parse(content));
+        console.log(privateKeyJwk)
       };
       reader.readAsText(file[0]);
     }
