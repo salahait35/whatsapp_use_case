@@ -31,7 +31,7 @@ builder.Services.AddControllers();
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost",
+    options.AddPolicy("AllowAll",
         builder =>
         {
             builder.WithOrigins("*") // Remplace par l'URL de ton SWA en local
