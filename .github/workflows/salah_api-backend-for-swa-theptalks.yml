@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - whatsapp
 
 on:
@@ -33,14 +30,14 @@ jobs:
 
       # Étape 5 : Publier les fichiers de l'application
       - name: dotnet publish
-        run: dotnet publish backend-whatsapp-use-case/backend-whatsapp-use-case.sln -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish backend-whatsapp-use-case/backend-whatsapp-use-case.sln -c Release -o ${{ github.workspace }}/myapp
 
       # Étape 6 : Téléverser l'artifact pour le job de déploiement
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ github.workspace }}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -71,4 +68,4 @@ jobs:
         with:
           app-name: 'whatsapp'
           slot-name: 'production'
-          package: .
+          package: ${{ github.workspace }}/myapp
