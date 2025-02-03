@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost",
         builder =>
         {
-            builder.WithOrigins("https://theptalks.net") // Remplace par l'URL de ton SWA en local
+            builder.WithOrigins("*") // Remplace par l'URL de ton SWA en local
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
@@ -50,7 +50,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Use CORS policy
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
