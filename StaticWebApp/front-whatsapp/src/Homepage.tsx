@@ -33,7 +33,7 @@ const Home: React.FC = () => {
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
 
-      const apiResponse = await fetch('https://localhost:7042/api/user/exists', {
+      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/exists', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -65,7 +65,7 @@ const Home: React.FC = () => {
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
 
-      const apiResponse = await fetch('https://localhost:7042/api/user/create', {
+      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/create', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -106,7 +106,7 @@ const Home: React.FC = () => {
         const response = await instance.acquireTokenSilent(request);
         const accessToken = response.accessToken;
 
-        const apiResponse = await fetch('https://localhost:7042/api/user/getorcreate', {
+        const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/getorcreate', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -162,7 +162,7 @@ const Home: React.FC = () => {
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
 
-      const apiResponse = await fetch('https://localhost:7042/api/conversations', {
+      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/conversations', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -194,7 +194,7 @@ const Home: React.FC = () => {
       const accessToken = response.accessToken;
   
       // Récupérer la clé publique de l'utilisateur actuel
-      const currentUserPublicKeyResponse = await fetch('https://localhost:7042/api/user/getpublickey', {
+      const currentUserPublicKeyResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/getpublickey', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -215,7 +215,7 @@ const Home: React.FC = () => {
       const currentUserPublicKey = JSON.parse(currentUserPublicKeyData.publicKey);
   
       // Récupérer la clé publique de l'utilisateur cible
-      const targetUserPublicKeyResponse = await fetch('https://localhost:7042/api/user/getpublickey', {
+      const targetUserPublicKeyResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/getpublickey', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -252,7 +252,7 @@ const Home: React.FC = () => {
         encryptedSymmetricKeys[participant] = btoa(String.fromCharCode(...new Uint8Array(encryptedKey)));
       }
   
-      const apiResponse = await fetch('https://localhost:7042/Conversation/Create', {
+      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/Conversation/Create', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -292,7 +292,7 @@ const Home: React.FC = () => {
         const response = await instance.acquireTokenSilent(request);
         const accessToken = response.accessToken;
 
-        const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversationId}/messages`, {
+        const apiResponse = await fetch(`https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/conversations/${conversationId}/messages`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -378,7 +378,7 @@ const Home: React.FC = () => {
         deleted: false
       };
   
-      const apiResponse = await fetch(`https://localhost:7042/api/conversations/${conversation.id}/send_message`, {
+      const apiResponse = await fetch(`https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/conversations/${conversation.id}/send_message`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
