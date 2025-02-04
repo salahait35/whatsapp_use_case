@@ -4,6 +4,7 @@ using WebappWhatsapp.Models;
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,19 +20,21 @@ builder.Services.AddSingleton<ICosmosDbService>(sp =>
     );
 });
 
-// Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// Add services to the container.
+
 
 builder.Services.AddControllers();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost",
+    options.AddPolicy("AllowAll",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000") // Remplace par l'URL de ton SWA en local
+            builder.WithOrigins("*") // Remplace par l'URL de ton SWA en local
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
@@ -47,7 +50,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Use CORS policy
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowAll");
 
 app.MapControllers();
 

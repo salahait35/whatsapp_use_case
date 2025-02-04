@@ -7,8 +7,9 @@
 
 html, body {
     height: 100%;
-    font-family: Arial, sans-serif;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     background-color: #f9f9f9;
+    color: #213547;
 }
 
 /* Conteneur principal */
@@ -61,7 +62,7 @@ html, body {
 /* Sidebar */
 .sidebar {
     width: 30%;
-    background-color: #999999;
+    background-color: #f1f1f1;
     border-right: 1px solid #ddd;
     padding: 20px;
     overflow-y: auto;
@@ -109,7 +110,7 @@ html, body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: #f1f1f1;
+    background-color: #ffffff;
 }
 
 .chat-messages {
@@ -120,6 +121,12 @@ html, body {
 
 .message {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-start; /* Aligne les messages à gauche */
+}
+
+.message.sent {
+    justify-content: flex-end; /* Aligne les messages envoyés à droite */
 }
 
 .message-text {
@@ -135,7 +142,6 @@ html, body {
 .message.sent .message-text {
     background-color: #007bff;
     color: white;
-    align-self: flex-end;
 }
 
 .message-time {
@@ -238,4 +244,9 @@ html, body {
 
 .modal-buttons button:first-child:hover {
     background-color: #d32f2f;
+}
+
+.error-message {
+    color: #f44336;
+    margin-bottom: 10px;
 }

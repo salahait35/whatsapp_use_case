@@ -7,31 +7,36 @@ namespace WebappWhatsapp.Models
     public class Conversation
     {
         [JsonProperty("id")] // Propriété obligatoire pour Cosmos DB
-        public string id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        public string Type { get; set; } = "text"; // Par défaut : "text"
+        [JsonProperty("participants")]
+        public List<string> Participants { get; set; } = new List<string>(); // Liste des participants
 
-        [JsonProperty("members")]
-        public List<string> Members { get; set; } = new List<string>(); // Liste des membres
-
+        [JsonProperty("lastMessage")]
         public string LastMessage { get; set; } = "No messages yet"; // Message par défaut
-        public DateTime LastMessageTimestamp { get; set; } = DateTime.UtcNow; // Timestamp actuel
+
+        [JsonProperty("timestamp")]
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow; // Timestamp actuel
+
+        [JsonProperty("participantKeys")]
+        public Dictionary<string, string> ParticipantKeys { get; set; } = new Dictionary<string, string>();
+
+        [JsonProperty("encryptedSymmetricKeys")]
+        public Dictionary<string, string> EncryptedSymmetricKeys { get; set; } = new Dictionary<string, string>();
 
         // Constructeur par défaut
         public Conversation()
         {
-            Members = new List<string>();
+            Participants = new List<string>();
         }
 
         // Constructeur avec paramètres
-        public Conversation(List<string> members, string type = "text", string lastMessage = "No messages yet")
+        public Conversation(List<string> participants, string lastMessage = "No messages yet")
         {
-
-            id = Guid.NewGuid().ToString();
-            Members = members ?? throw new ArgumentNullException(nameof(members), "Members list cannot be null.");
-            Type = type;
+            Id = Guid.NewGuid().ToString();
+            Participants = participants ?? throw new ArgumentNullException(nameof(participants), "Participants list cannot be null.");
             LastMessage = lastMessage;
-            LastMessageTimestamp = DateTime.UtcNow;
+            Timestamp = DateTime.UtcNow;
         }
     }
 }

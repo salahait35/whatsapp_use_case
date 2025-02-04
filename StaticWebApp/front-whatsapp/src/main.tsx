@@ -88,9 +88,9 @@ const Root: React.FC = () => {
 };
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <MsalProvider instance={msalInstance}>
       <Root />
     </MsalProvider>
-  </React.StrictMode>
+  //</React.StrictMode>
 );

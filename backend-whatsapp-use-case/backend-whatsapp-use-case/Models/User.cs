@@ -1,31 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Newtonsoft.Json;
 
 namespace WebappWhatsapp.Models
 {
-
     public class User
     {
         [JsonProperty("id")]
-        public string id { get; set; } = string.Empty;  // Ou utilisez nullable : public string? id { get; set; }
+        public string Id { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Id { get; set; }
+
+        [JsonProperty("email")]
         public string Email { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Email { get; set; }
-        public string Username { get; set; } = string.Empty;  // Ou utilisez nullable : public string? Username { get; set; }
 
-    
+        [JsonProperty("username")]
+        public string Username { get; set; } = string.Empty;
 
-    public User(string Id, string email, string username)
+        [JsonProperty("publickey")]
+        public string PublicKey { get; set; } = string.Empty;
+
+        // Constructeur avec paramètres
+        public User(string id, string email, string username, string publickey)
         {
-            id = Id;
+            Id = id;
             Email = email;
-            Username = username; //TODO check if required
+            Username = username; 
+            PublicKey = publickey;
         }
-    public User()
+
+        // Constructeur par défaut
+        public User()
         {
-            id = Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
             Email = string.Empty;
             Username = string.Empty;
+            PublicKey = string.Empty;
         }
-
     }
-
-    }
+}
