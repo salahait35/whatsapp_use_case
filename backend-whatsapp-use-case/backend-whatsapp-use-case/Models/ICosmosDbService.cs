@@ -14,6 +14,8 @@ namespace WebappWhatsapp.Models
         Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query); // Méthode pour requêter des éléments
         Task AddItemAsync<T>(string containerName, T item); // Méthode pour ajouter un élément
         Task AddItemWithPartitionKeyAsync<T>(string containerName, T item, string partitionKeyValue); // Méthode pour ajouter un élément avec clé de partition
+        Task<T> GetItemAsync<T>(string containerName, string id); // Méthode pour récupérer un élément par ID
+        Task UpdateItemAsync<T>(string containerName, string id, T item); // Méthode pour mettre à jour un élément
     }
 
     // Implémentation du service Cosmos DB
@@ -80,6 +82,26 @@ namespace WebappWhatsapp.Models
             {
                 throw new Exception($"Erreur lors de la vérification ou de l'ajout de l'utilisateur : {ex.Message}", ex);
             }
+        }
+
+        public async Task<T> GetItemAsync<T>(string containerName, string id)
+        {
+            try
+            {
+                var container = GetContainer(containerName);
+                ItemResponse<T> response = await container.ReadItemAsync<T>(id, new PartitionKey(id));
+                return response.Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return default;
+            }
+        }
+
+        public async Task UpdateItemAsync<T>(string containerName, string id, T item)
+        {
+            var container = GetContainer(containerName);
+            await container.ReplaceItemAsync(item, id, new PartitionKey(id));
         }
 
         public async Task<IEnumerable<T>> QueryItemsAsync<T>(string containerName, string query)

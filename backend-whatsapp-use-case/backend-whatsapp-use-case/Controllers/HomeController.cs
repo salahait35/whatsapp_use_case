@@ -135,11 +135,12 @@ namespace WebappWhatsapp.Controllers
 
         private async Task<List<Message>> GetMessagesForConversationAsync(string conversationId)
         {
-            var query = $"SELECT * FROM c WHERE c.conversationId = '{conversationId}' ORDER BY c.timestamp ASC";
+            var query = $"SELECT * FROM c WHERE c.conversationId = '{conversationId}' AND c.deleted = false ORDER BY c.timestamp ASC";
 
             var results = await _cosmosDbService.QueryItemsAsync<Message>("Messages", query);
             return results.ToList();
         }
+
 
         [HttpPost]
         [Route("Conversation/Create")]
@@ -327,6 +328,87 @@ namespace WebappWhatsapp.Controllers
 
             return Ok(newUser);
         }
+
+
+
+        [HttpPost]
+        [Route("api/messages/{messageId}/delete")]
+        public async Task<IActionResult> DeleteMessageAsync(string messageId)
+        {
+            if (string.IsNullOrEmpty(messageId))
+            {
+                return BadRequest(new { message = "L'identifiant du message est requis." });
+            }
+
+            try
+            {
+                // Récupérer le message par ID
+                var message = await _cosmosDbService.GetItemAsync<Message>("Messages", messageId);
+                if (message == null)
+                {
+                    return NotFound(new { message = "Message non trouvé." });
+                }
+
+                // Mettre à jour le champ deleted à true
+                message.Deleted = true;
+
+                // Mettre à jour le message dans la base de données
+                await _cosmosDbService.UpdateItemAsync("Messages", messageId, message);
+
+                return Ok(new { message = "Message supprimé avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de la suppression du message.", details = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("api/messages/{messageId}/edit")]
+        public async Task<IActionResult> EditMessageAsync(string messageId, [FromBody] EditMessageRequest request)
+        {
+            if (string.IsNullOrEmpty(messageId))
+            {
+                return BadRequest(new { message = "L'identifiant du message est requis." });
+            }
+
+            if (request == null || string.IsNullOrEmpty(request.Content) || string.IsNullOrEmpty(request.Iv))
+            {
+                return BadRequest(new { message = "Le nouveau contenu du message et l'IV sont requis." });
+            }
+
+            try
+            {
+                // Récupérer le message par ID
+                var message = await _cosmosDbService.GetItemAsync<Message>("Messages", messageId);
+                if (message == null)
+                {
+                    return NotFound(new { message = "Message non trouvé." });
+                }
+
+                // Mettre à jour le contenu du message et l'IV
+                message.Content = request.Content;
+                message.Iv = request.Iv;
+
+                // Mettre à jour le message dans la base de données
+                await _cosmosDbService.UpdateItemAsync("Messages", messageId, message);
+
+                return Ok(new { message = "Message modifié avec succès." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Une erreur est survenue lors de la modification du message.", details = ex.Message });
+            }
+        }
+
+        public class EditMessageRequest
+        {
+            public string Content { get; set; }
+            public string Iv { get; set; }
+        }
+
+
 
 
 

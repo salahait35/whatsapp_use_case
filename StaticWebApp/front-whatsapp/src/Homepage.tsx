@@ -16,6 +16,8 @@ const Home: React.FC = () => {
   const [keysGenerated, setKeysGenerated] = useState(false); // État pour suivre si les clés ont été générées
   const [isCreatingUser, setIsCreatingUser] = useState(false); // État pour éviter les appels multiples
   const [privateKeyJwk, setPrivateKeyJwk] = useState<JsonWebKey | null>(null); // État pour la clé privée
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingMessageContent, setEditingMessageContent] = useState<string>("");
 
   const currentAccount = accounts[0];
 
@@ -26,14 +28,14 @@ const Home: React.FC = () => {
   const userExists = async (email: string) => {
     try {
       const request = {
-        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"], //TODO EDIT global azure ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"], local : ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"]
         account: currentAccount
       };
 
       const response = await instance.acquireTokenSilent(request);
       const accessToken = response.accessToken;
 
-      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/exists', {
+      const apiResponse = await fetch('https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/user/exists', {   //TODO EDIT global azure : https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net,  local : https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -437,6 +439,99 @@ const Home: React.FC = () => {
     }
   };
 
+
+  const deleteMessage = async (messageId: string) => {
+    try {
+      const request = {
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
+        account: currentAccount
+      };
+
+      const response = await instance.acquireTokenSilent(request);
+      const accessToken = response.accessToken;
+
+      const apiResponse = await fetch(`https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/messages/${messageId}/delete`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+      getMessages(conversation.id) //TODO a changer c'est DEGEULASSE
+    
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
+  const editMessage = async () => {
+    if (!editingMessageContent.trim()) return;
+  
+    try {
+      const request = {
+        scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
+        account: currentAccount
+      };
+  
+      const response = await instance.acquireTokenSilent(request);
+      const accessToken = response.accessToken;
+  
+      // Récupérer la clé symétrique chiffrée et la déchiffrer
+      const encryptedSymmetricKey = conversation.encryptedSymmetricKeys[currentAccount.username];
+      const privateKeyJwkString = localStorage.getItem('privateKeyJwk');
+      if (!privateKeyJwkString) {
+        throw new Error('Private key not found. Please import your private key.');
+      }
+      const privateKeyJwk = JSON.parse(privateKeyJwkString);
+      const symmetricKey = await decryptSymmetricKey(privateKeyJwk, encryptedSymmetricKey);
+  
+      // Chiffrer le message avec la clé symétrique
+      const { encryptedMessage, iv } = await encryptMessageWithSymmetricKey(symmetricKey, editingMessageContent);
+      const message = {
+        Content: btoa(String.fromCharCode(...new Uint8Array(encryptedMessage))), // Convertir en base64
+        iv: btoa(String.fromCharCode(...new Uint8Array(iv))) // Convertir en base64
+      };
+  
+      const apiResponse = await fetch(`https://api-backend-for-swa-theptalks-gph6h0hxfddva4au.francecentral-01.azurewebsites.net/api/messages/${editingMessageId}/edit`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify(message)
+      });
+  
+      if (!apiResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // Mettre à jour l'état local pour refléter la modification du message
+      setMessages(messages.map(msg => 
+        msg.id === editingMessageId ? { ...msg, content: editingMessageContent } : msg
+      ));
+      handleCancelEdit();
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
+
+
+ const handleEdit = (messageId: string, currentContent: string) => {
+  setEditingMessageId(messageId);
+  setEditingMessageContent(currentContent);
+};
+
+const handleCancelEdit = () => {
+  setEditingMessageId(null);
+  setEditingMessageContent("");
+};
   return (
     <div className="home-container">
       <header className="header">
@@ -446,7 +541,7 @@ const Home: React.FC = () => {
           <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
       </header>
-
+  
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
@@ -465,7 +560,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       )}
-
+  
       <div className="main-content">
         <aside className="sidebar">
           <div className="sidebar-header">
@@ -485,13 +580,29 @@ const Home: React.FC = () => {
             ))}
           </ul>
         </aside>
-
+  
         <section className="chat-section">
           <div className="chat-messages">
             {messages.map((message) => (
               <div key={message.id} className={`message ${message.senderId === user?.id ? 'sent' : 'received'}`}>
-                <p className="message-text">{message.content}</p>
-                <span className="message-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
+                {editingMessageId === message.id ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={editingMessageContent}
+                      onChange={(e) => setEditingMessageContent(e.target.value)}
+                    />
+                    <button onClick={editMessage}>Modifier</button>
+                    <button onClick={handleCancelEdit}>Annuler</button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="message-text">{message.content}</p>
+                    <span className="message-time">{new Date(message.timestamp).toLocaleTimeString()}</span>
+                    <button className="message-button" onClick={() => deleteMessage(message.id)}>Supprimer</button>
+                    <button className="message-button" onClick={() => handleEdit(message.id, message.content)}>Modifier</button>
+                  </>
+                )}
               </div>
             ))}
           </div>

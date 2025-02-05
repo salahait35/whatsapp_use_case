@@ -1,11 +1,11 @@
 export const msalConfig = {
   auth: {
-      clientId: "ed465e2d-4a05-4265-b2e2-960133c6c32a",//"ffef2490-f249-40a4-a713-61dc878a157a" pour localhost,  // Utilisez votre ClientId Azure AD B2C
+      clientId: "ed465e2d-4a05-4265-b2e2-960133c6c32a",//TODO EDIT GLOBAL AZURE"ed465e2d-4a05-4265-b2e2-960133c6c32a", pour localhost " ffef2490-f249-40a4-a713-61dc878a157a",  // Utilisez votre ClientId Azure AD B2C
       authority: "https://whatsappissy.b2clogin.com/whatsappissy.onmicrosoft.com/b2c_1_susi",  // URL d'autorité spécifique à votre politique B2C
       knownAuthorities: ["whatsappissy.b2clogin.com"],  // Spécifiez l'autorité connue
       cloudDiscoveryMetadata: "",  // Laissez vide si vous ne l'utilisez pas
-      redirectUri: "https://theptalks.net", //"http://localhost:5173/" // URL de redirection après authentification
-      postLogoutRedirectUri: "https://theptalks.net",  // URL de redirection après la déconnexion
+      redirectUri: "https://theptalks.net",// TODO EDIT/ AZURE https://theptalks.net", LOCAL //"http://localhost:5173/" // URL de redirection après authentification
+      postLogoutRedirectUri: "https://theptalks.net",//"https://theptalks.net",  // URL de redirection après la déconnexion
       navigateToLoginRequestUrl: true,
       clientCapabilities: ["CP1"],  // Ajoutez cette ligne si nécessaire
       tenantId: "98a36095-ba04-4fed-85fc-d4c844826790"
@@ -21,7 +21,7 @@ export const msalConfig = {
   */
 
   
-    scopes: ["https://whatsappissy.onmicrosoft.com/e1b1fe84-91db-44ac-8a19-e5ff1adbafec/getallusers"],
+    scopes: ["https://whatsappissy.onmicrosoft.com/f9cfeb56-5f0b-4cff-a035-797a92cb5e5e/api-of-the-back-end"],
 
   telemetry: {
       application: {

@@ -250,3 +250,17 @@ html, body {
     color: #f44336;
     margin-bottom: 10px;
 }
+/* Styles pour les boutons de suppression et de modification */
+.message-button {
+    background-color: transparent;
+    color: #007bff;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 5px;
+    transition: color 0.3s ease;
+}
+
+.message-button:hover {
+    color: #0056b3;
+}
